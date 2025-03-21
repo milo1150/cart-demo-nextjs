@@ -1,18 +1,19 @@
 'use client'
 
-import { Button } from 'antd'
+import { Button, Input } from 'antd'
 import { useRouter } from 'next/navigation'
 
-const Cart: React.FC = () => {
+const Product: React.FC = () => {
   const router = useRouter()
 
   return (
     <>
+      <Input placeholder="Product Input" />
       <Button type="primary" onClick={() => router.push('/')}>
-        Cart - Button
+        Product - Button
       </Button>
     </>
   )
 }
 
-export default Cart
+export default Product

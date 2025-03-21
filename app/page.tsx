@@ -4,7 +4,7 @@ import React from 'react'
 import { Button } from 'antd'
 
 const Home = () => (
-  <div className="App h-lvh">
+  <div className="App">
     <Button type="primary">Main - Button</Button>
   </div>
 )
