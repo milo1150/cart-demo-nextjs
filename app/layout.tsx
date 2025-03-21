@@ -3,6 +3,11 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 
 /**
+ * @see https://ant.design/docs/react/v5-for-19
+ */
+import '@ant-design/v5-patch-for-react-19'
+
+/**
  * @description prevent page flicker
  * @see https://ant.design/docs/react/use-with-next?theme=dark#using-app-router
  */
