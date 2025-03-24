@@ -24,7 +24,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Cart Demo',
+  title: 'Cart',
   description: 'Cart Demo App for testing only',
 }
 
