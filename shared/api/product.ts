@@ -9,5 +9,8 @@ export async function getProducts(params: GetProductsQueryparams): Promise<Produ
   return await axiosInstanceWithAuth
     .get<Product[]>('/shop-product/product/products', { params })
     .then((res) => res.data)
-    .catch((err) => err)
+    .catch((err) => {
+      console.error(err)
+      return []
+    })
 }

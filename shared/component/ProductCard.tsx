@@ -2,15 +2,25 @@
 
 import { Card, Button, ConfigProvider } from 'antd'
 import { ShoppingCartOutlined } from '@ant-design/icons'
+import { useCartStore } from '@shared/store/cart'
+import { CartProduct } from '@shared/schema/product'
+import { useEffect } from 'react'
 
 type ProductProps = {
   image: string
   title: string
   price: number
+  product: CartProduct
   isNew?: boolean
 }
 
-export default function ProductCard({ image, title, price }: ProductProps) {
+const ProductCard: React.FC<ProductProps> = ({ image, title, price, product }) => {
+  const cartStore = useCartStore((state) => state)
+
+  useEffect(() => {
+    console.log(cartStore.shops)
+  }, [cartStore.shops])
+
   return (
     <ConfigProvider theme={{ components: { Card: { bodyPadding: 10 } } }}>
       <Card
@@ -38,6 +48,7 @@ export default function ProductCard({ image, title, price }: ProductProps) {
               shape="default"
               className="bg-blue-600 hover:bg-blue-700 border-none w-12 h-12 flex items-center justify-center"
               icon={<ShoppingCartOutlined className="text-xl" />}
+              onClick={() => cartStore.addProduct(product)}
             />
           </div>
         </div>
@@ -45,3 +56,5 @@ export default function ProductCard({ image, title, price }: ProductProps) {
     </ConfigProvider>
   )
 }
+
+export default ProductCard

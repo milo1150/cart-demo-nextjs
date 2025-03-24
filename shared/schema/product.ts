@@ -1,4 +1,6 @@
-export interface Product {
+import { ShopResponse } from './shop'
+
+export interface ProductResponse {
   id: number
   created_at: string
   updated_at: string
@@ -9,5 +11,20 @@ export interface Product {
   price: number
   stock: number
   image_url: string
-  shop_id: number
+  shop: ShopResponse
+}
+
+export type CartProduct = {
+  id: number
+  createdAt: string
+  updatedAt: string
+  uuid: string
+  name: string
+  description: string
+  price: number
+  stock: number
+  imageUrl: string
+  shop: ShopResponse
+
+  count: number
 }

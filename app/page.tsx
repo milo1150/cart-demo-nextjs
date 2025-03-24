@@ -8,6 +8,7 @@ import { Row, Col, Button } from 'antd'
 import { QueryClient, QueryClientProvider, useMutation, useQuery } from '@tanstack/react-query'
 import { getProducts, GetProductsQueryparams } from '@/shared/api/product'
 import { login } from '@/shared/api/user'
+import { transformCartProduct } from '@shared/dto/product'
 
 // Create a client
 const queryClient = new QueryClient()
@@ -38,6 +39,9 @@ const Home: React.FC = () => {
     queryFn: () => getProducts(params),
     retry: false,
     refetchOnWindowFocus: false,
+    select(data) {
+      return data.map((item) => transformCartProduct(item))
+    },
   })
 
   const fetchProduct = () => {
@@ -58,7 +62,12 @@ const Home: React.FC = () => {
           {productQuery.data?.map((product) => {
             return (
               <Col key={product.id} xs={12} sm={8} md={6} lg={6} xl={6}>
-                <ProductCard image={product.image_url} price={product.price} title={product.name} />
+                <ProductCard
+                  image={product.imageUrl}
+                  price={product.price}
+                  title={product.name}
+                  product={product}
+                />
               </Col>
             )
           })}
