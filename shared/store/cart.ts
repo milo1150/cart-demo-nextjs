@@ -8,7 +8,7 @@ export type CartState = {
 }
 
 export type CartAction = {
-  addProduct: (product: CartProduct) => void
+  addProduct: (product: CartProduct, inc: number) => void
   increaseProduct: (product: CartProduct, inc: number) => void
 }
 
@@ -19,11 +19,11 @@ export type CartAction = {
  */
 const useCartStore = create<CartState & CartAction>()((set) => ({
   shops: [],
-  addProduct: (product) =>
+  addProduct: (product, inc) =>
     set((state) => {
       const copyShops = [...state.shops]
       const shopIndex = findShopIndexInCart(copyShops, product.shop.id)
-      product.count = 1 // set product count as 1
+      product.count = inc // set product count as 1
 
       // Not found specific shop
       if (shopIndex === -1) {

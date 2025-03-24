@@ -11,13 +11,13 @@ type ProductProps = {
   product: CartProduct
 }
 
-const ProductCard: React.FC<ProductProps> = ({ product }) => {
+const ProductCardActionButtons: React.FC<ProductProps> = ({ product }) => {
   const cartStore = useCartStore((state) => state)
   const [count, setCount] = useState<number>(1)
 
   useEffect(() => {
-    console.log(cartStore.shops)
-  }, [cartStore.shops])
+    setCount(1)
+  }, [product])
 
   const increaseCount = (): void => {
     if (count >= product.stock) return
@@ -34,9 +34,36 @@ const ProductCard: React.FC<ProductProps> = ({ product }) => {
     if (findProduct.ok) {
       cartStore.increaseProduct(product, count)
     } else {
-      cartStore.addProduct(product)
+      cartStore.addProduct(product, count)
     }
   }
+
+  return (
+    <div className="flex justify-end gap-1 mt-2">
+      <Button className="w-1!" onClick={() => decreaseCount()}>
+        -
+      </Button>
+      <Input className="w-10! pointer-events-none justify-items-center" value={count} />
+      <Button className="w-1!" onClick={() => increaseCount()}>
+        +
+      </Button>
+      <Button
+        variant="filled"
+        shape="default"
+        className="bg-blue-600 hover:bg-blue-700 border-none w-9! flex items-center justify-center"
+        icon={<ShoppingCartOutlined className="text-lg!" />}
+        onClick={() => onClickAddToCart()}
+      />
+    </div>
+  )
+}
+
+const ProductCard: React.FC<ProductProps> = ({ product }) => {
+  const cartStore = useCartStore((state) => state)
+
+  useEffect(() => {
+    console.log(cartStore.shops)
+  }, [cartStore.shops])
 
   return (
     <ConfigProvider theme={{ components: { Card: { bodyPadding: 10 } } }}>
@@ -68,22 +95,7 @@ const ProductCard: React.FC<ProductProps> = ({ product }) => {
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-1 mt-2">
-            <Button className="w-1!" onClick={() => decreaseCount()}>
-              -
-            </Button>
-            <Input className="w-10! pointer-events-none justify-items-center" value={count} />
-            <Button className="w-1!" onClick={() => increaseCount()}>
-              +
-            </Button>
-            <Button
-              variant="filled"
-              shape="default"
-              className="bg-blue-600 hover:bg-blue-700 border-none w-9! flex items-center justify-center"
-              icon={<ShoppingCartOutlined className="text-lg!" />}
-              onClick={() => onClickAddToCart()}
-            />
-          </div>
+          <ProductCardActionButtons product={product} />
         </div>
       </Card>
     </ConfigProvider>
