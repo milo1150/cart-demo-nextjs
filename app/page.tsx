@@ -6,7 +6,7 @@ import SearchInput from '@/shared/component/SearchInput'
 import ProductCard from '@/shared/component/ProductCard'
 import { Row, Col, Button } from 'antd'
 import { QueryClient, QueryClientProvider, useMutation, useQuery } from '@tanstack/react-query'
-import { auth, getProducts, GetProductsQueryparams } from '@/shared/api/product'
+import { getProducts, GetProductsQueryparams } from '@/shared/api/product'
 import { login } from '@/shared/api/user'
 
 // Create a client
@@ -20,27 +20,24 @@ const UserLogin = () => {
       console.log(res)
     },
   })
-  const authQuery = useQuery({ queryKey: ['auth'], queryFn: auth, retry: false })
+  // const authQuery = useQuery({ queryKey: ['auth'], queryFn: auth, retry: false })
 
   useEffect(() => {
     userQuery.mutate({ username: 'a', pwd: 'a' })
   }, [])
 
-  const checkAuth = () => {
-    authQuery.refetch()
-  }
-
-  return { userQuery, authQuery, checkAuth }
+  return { userQuery }
 }
 
 const Home: React.FC = () => {
-  const { checkAuth } = UserLogin()
+  const {} = UserLogin() // FIXME: remove
 
   const params: GetProductsQueryparams = { page_size: 20 }
   const productQuery = useQuery({
     queryKey: ['product', params],
     queryFn: () => getProducts(params),
     retry: false,
+    refetchOnWindowFocus: false,
   })
 
   const fetchProduct = () => {
@@ -56,7 +53,6 @@ const Home: React.FC = () => {
 
         {/* TODO: delete */}
         <Button onClick={fetchProduct}>fetch product</Button>
-        <Button onClick={checkAuth}>Check auth</Button>
 
         <Row gutter={[16, 16]} className="mt-4">
           {productQuery.data?.map((product) => {

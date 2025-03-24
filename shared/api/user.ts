@@ -1,5 +1,5 @@
 import { LoginPayload, LoginResponse } from '../schema/user'
-import { axiosBaseInstance } from './axios'
+import { axiosBaseInstance, axiosInstanceWithAuth } from './axios'
 
 export async function login(payload: LoginPayload): Promise<string> {
   return await axiosBaseInstance
@@ -10,5 +10,12 @@ export async function login(payload: LoginPayload): Promise<string> {
 
       return res.data.token
     })
+    .catch((err) => err)
+}
+
+export async function auth() {
+  return await axiosInstanceWithAuth
+    .get('/user/auth')
+    .then((res) => res.data)
     .catch((err) => err)
 }

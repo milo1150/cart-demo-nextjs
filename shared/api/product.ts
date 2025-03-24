@@ -11,10 +11,3 @@ export async function getProducts(params: GetProductsQueryparams): Promise<Produ
     .then((res) => res.data)
     .catch((err) => err)
 }
-
-export async function auth() {
-  return await axiosInstanceWithAuth
-    .get('/user/auth')
-    .then((res) => res.data)
-    .catch((err) => err)
-}
