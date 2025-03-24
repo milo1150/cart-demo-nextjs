@@ -62,12 +62,7 @@ const Home: React.FC = () => {
           {productQuery.data?.map((product) => {
             return (
               <Col key={product.id} xs={12} sm={8} md={6} lg={6} xl={6}>
-                <ProductCard
-                  image={product.imageUrl}
-                  price={product.price}
-                  title={product.name}
-                  product={product}
-                />
+                <ProductCard product={product} />
               </Col>
             )
           })}

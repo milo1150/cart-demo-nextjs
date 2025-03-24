@@ -1,5 +1,6 @@
 import { CartProduct } from '@shared/schema/product'
 import { CartShop } from '@shared/schema/shop'
+import { findShopIndexInCart, findProductInCart } from '@shared/utils/cart'
 import { create } from 'zustand'
 
 export type CartState = {
@@ -8,31 +9,7 @@ export type CartState = {
 
 export type CartAction = {
   addProduct: (product: CartProduct) => void
-  increaseProduct: (product: CartProduct) => void
-}
-
-export function findProductInCart(
-  shops: CartShop[],
-  product: CartProduct
-): { ok: boolean; product: CartProduct | null; productIndex: number } {
-  const findShopIndex: number = shops.findIndex((shop) => shop.id === product.shop.id)
-  if (findShopIndex < 0) return { ok: false, product: null, productIndex: -1 }
-  const findProductIndex: number = shops[findShopIndex].products.findIndex(
-    (item) => item.id === product.id
-  )
-  return {
-    ok: true,
-    product: shops[findShopIndex].products[findProductIndex],
-    productIndex: findProductIndex,
-  }
-}
-
-export function findShopInCart(shops: CartShop[], shopId: number): boolean {
-  return !!shops.find((shop) => shop.id === shopId)
-}
-
-export function findShopIndexInCart(shops: CartShop[], shopId: number): number {
-  return shops.findIndex((shop) => shop.id === shopId)
+  increaseProduct: (product: CartProduct, inc: number) => void
 }
 
 /**
@@ -65,16 +42,16 @@ const useCartStore = create<CartState & CartAction>()((set) => ({
       return { ...state, shops: copyShops }
     }),
 
-  increaseProduct: (product) => {
+  increaseProduct: (product, inc) => {
     set((state) => {
       const copyShops = [...state.shops]
       const findProduct = findProductInCart(copyShops, product)
-      if (findProduct.ok) {
-        const shopIndex = findShopIndexInCart(copyShops, product.shop.id)
-        if (shopIndex > -1) {
-          copyShops[shopIndex].products[findProduct.productIndex].count += 1
-        }
+      const shopIndex = findShopIndexInCart(copyShops, product.shop.id)
+
+      if (findProduct.ok && shopIndex > -1) {
+        copyShops[shopIndex].products[findProduct.productIndex].count += inc
       }
+
       return { ...state, shops: copyShops }
     })
   },
