@@ -56,6 +56,12 @@ const useCartStore = create<CartState & CartAction>()((set, get) => ({
         copyShops[findProduct.shopIndex].products[findProduct.productIndex].count += inc
       }
 
+      // Prevent add item over current stock
+      const count = copyShops[findProduct.shopIndex].products[findProduct.productIndex].count
+      if (count > product.stock) {
+        copyShops[findProduct.shopIndex].products[findProduct.productIndex].count = product.stock
+      }
+
       return { ...state, shops: copyShops }
     })
   },
