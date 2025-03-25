@@ -25,11 +25,16 @@ const initCart: CartState = {
  */
 const useCartStore = create<CartState & CartAction>()((set, get) => ({
   shops: [],
+  reset: () => {
+    set(initCart)
+  },
   addProduct: (product, inc) =>
     set((state) => {
       const copyShops = [...state.shops]
       const shopIndex = findShopIndexInCart(copyShops, product.shop.id)
-      product.count = inc // set product count as 1
+
+      // Set product count
+      product.count = inc
 
       // Not found specific shop
       if (shopIndex === -1) {
@@ -71,9 +76,6 @@ const useCartStore = create<CartState & CartAction>()((set, get) => ({
     if (!findProduct.ok) return 0
 
     return (findProduct.product as CartProduct).count
-  },
-  reset: () => {
-    set(initCart)
   },
 }))
 
