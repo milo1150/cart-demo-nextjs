@@ -10,6 +10,12 @@ export type CartState = {
 export type CartAction = {
   addProduct: (product: CartProduct, inc: number) => void
   increaseProduct: (product: CartProduct, inc: number) => void
+  getCurrentProductCount: (product: CartProduct) => number
+  reset: () => void
+}
+
+const initCart: CartState = {
+  shops: [],
 }
 
 /**
@@ -17,7 +23,7 @@ export type CartAction = {
  * If need to track change in useEffect then wrap with immer()
  * @see https://zustand.docs.pmnd.rs/middlewares/immer
  */
-const useCartStore = create<CartState & CartAction>()((set) => ({
+const useCartStore = create<CartState & CartAction>()((set, get) => ({
   shops: [],
   addProduct: (product, inc) =>
     set((state) => {
@@ -41,7 +47,6 @@ const useCartStore = create<CartState & CartAction>()((set) => ({
 
       return { ...state, shops: copyShops }
     }),
-
   increaseProduct: (product, inc) => {
     set((state) => {
       const copyShops = [...state.shops]
@@ -53,6 +58,16 @@ const useCartStore = create<CartState & CartAction>()((set) => ({
 
       return { ...state, shops: copyShops }
     })
+  },
+  getCurrentProductCount: (product) => {
+    const findProduct = findProductInCart(get().shops, product)
+
+    if (!findProduct.ok) return 0
+
+    return (findProduct.product as CartProduct).count
+  },
+  reset: () => {
+    set(initCart)
   },
 }))
 

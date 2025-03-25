@@ -1,6 +1,6 @@
 'use client'
 
-import { Card, Button, ConfigProvider, Input } from 'antd'
+import { Card, Button, ConfigProvider, Input, Badge } from 'antd'
 import { ShoppingCartOutlined } from '@ant-design/icons'
 import { useCartStore } from '@shared/store/cart'
 import { CartProduct } from '@shared/schema/product'
@@ -17,7 +17,8 @@ type ProductProps = {
 
 const ProductCardActionButton: React.FC<ProductCardActionButtonProps> = ({ product }) => {
   const cartStore = useCartStore((state) => state)
-  const [count, setCount] = useState<number>(1)
+  const countProductInCart: number = cartStore.getCurrentProductCount(product)
+  const [count, setCount] = useState<number>(0)
 
   useEffect(() => {
     console.log(cartStore.shops)
@@ -58,13 +59,17 @@ const ProductCardActionButton: React.FC<ProductCardActionButtonProps> = ({ produ
       <Button className="w-1!" onClick={() => increaseCount()}>
         +
       </Button>
-      <Button
-        variant="filled"
-        shape="default"
-        className="bg-blue-600 hover:bg-blue-700 border-none w-9! flex items-center justify-center"
-        icon={<ShoppingCartOutlined className="text-lg!" />}
-        onClick={() => onClickAddToCart()}
-      />
+      <ConfigProvider theme={{ token: { paddingXS: 1 } }}>
+        <Badge count={countProductInCart} size="small" offset={[-4, 0]} className="hello-world">
+          <Button
+            variant="filled"
+            shape="default"
+            className="bg-blue-600 hover:bg-blue-700 border-none w-9! flex items-center justify-center"
+            icon={<ShoppingCartOutlined className="text-lg!" />}
+            onClick={() => onClickAddToCart()}
+          />
+        </Badge>
+      </ConfigProvider>
     </div>
   )
 }
