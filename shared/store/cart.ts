@@ -46,10 +46,9 @@ const useCartStore = create<CartState & CartAction>()((set) => ({
     set((state) => {
       const copyShops = [...state.shops]
       const findProduct = findProductInCart(copyShops, product)
-      const shopIndex = findShopIndexInCart(copyShops, product.shop.id)
 
-      if (findProduct.ok && shopIndex > -1) {
-        copyShops[shopIndex].products[findProduct.productIndex].count += inc
+      if (findProduct.ok) {
+        copyShops[findProduct.shopIndex].products[findProduct.productIndex].count += inc
       }
 
       return { ...state, shops: copyShops }

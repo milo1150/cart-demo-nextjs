@@ -7,13 +7,21 @@ import { CartProduct } from '@shared/schema/product'
 import { useEffect, useState } from 'react'
 import { findProductInCart } from '@shared/utils/cart'
 
+type ProductCardActionButtonProps = {
+  product: CartProduct
+}
+
 type ProductProps = {
   product: CartProduct
 }
 
-const ProductCardActionButtons: React.FC<ProductProps> = ({ product }) => {
+const ProductCardActionButton: React.FC<ProductCardActionButtonProps> = ({ product }) => {
   const cartStore = useCartStore((state) => state)
   const [count, setCount] = useState<number>(1)
+
+  useEffect(() => {
+    console.log(cartStore.shops)
+  }, [cartStore.shops])
 
   useEffect(() => {
     setCount(1)
@@ -31,10 +39,13 @@ const ProductCardActionButtons: React.FC<ProductProps> = ({ product }) => {
 
   const onClickAddToCart = (): void => {
     const findProduct = findProductInCart(cartStore.shops, product)
+
+    if (!findProduct.ok) {
+      cartStore.addProduct(product, count)
+    }
+
     if (findProduct.ok) {
       cartStore.increaseProduct(product, count)
-    } else {
-      cartStore.addProduct(product, count)
     }
   }
 
@@ -59,12 +70,6 @@ const ProductCardActionButtons: React.FC<ProductProps> = ({ product }) => {
 }
 
 const ProductCard: React.FC<ProductProps> = ({ product }) => {
-  const cartStore = useCartStore((state) => state)
-
-  useEffect(() => {
-    console.log(cartStore.shops)
-  }, [cartStore.shops])
-
   return (
     <ConfigProvider theme={{ components: { Card: { bodyPadding: 10 } } }}>
       <Card
@@ -88,6 +93,12 @@ const ProductCard: React.FC<ProductProps> = ({ product }) => {
             <p className="text-xl font-bold">${product.price}</p>
           </div>
 
+          {/* Shop name */}
+          <div className="flex justify-between text-center items-end pb-1">
+            <p className="text-gray-500 text-sm">Shop:</p>
+            <p className="text-md font-bold">{product.shop.name}</p>
+          </div>
+
           {/* Stock */}
           <div className="flex justify-between text-center items-end pb-1">
             <p className="text-gray-500 text-sm">Stock:</p>
@@ -95,7 +106,7 @@ const ProductCard: React.FC<ProductProps> = ({ product }) => {
           </div>
 
           {/* Actions */}
-          <ProductCardActionButtons product={product} />
+          <ProductCardActionButton product={product} />
         </div>
       </Card>
     </ConfigProvider>
