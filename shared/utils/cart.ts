@@ -48,8 +48,7 @@ export function getTotalProductPrice(price: number, count: number): number {
 
 export function setAllCheckedProduct(products: CartProduct[], status: boolean): CartProduct[] {
   return products.map((product) => {
-    product.checked = status
-    return product
+    return { ...product, checked: status }
   })
 }
 

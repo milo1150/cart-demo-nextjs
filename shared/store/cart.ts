@@ -167,13 +167,16 @@ const useCartStore = create<CartState & CartAction>()((set, get) => ({
       // Handle shop checked
       copyState.shops[findShop.shopIndex].checked = status
 
-      // Handle product checked
+      // Filter which product should get update
       const products = copyState.shops[findShop.shopIndex].products
+      const uncheckProducts = products.filter((product) => !product.checked)
+
+      // Handle product checked value
       copyState.shops[findShop.shopIndex].products = setAllCheckedProduct(products, status)
 
       // Handle Selected Products
       copyState.selectedProducts = status
-        ? updateSelectedProductItem(state.selectedProducts, products)
+        ? updateSelectedProductItem(state.selectedProducts, uncheckProducts)
         : removeSelectedProductItem(state.selectedProducts, products)
 
       return copyState
