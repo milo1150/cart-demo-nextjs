@@ -17,7 +17,7 @@ type ProductProps = {
 
 const ProductCardActionButton: React.FC<ProductCardActionButtonProps> = ({ product }) => {
   const cartStore = useCartStore((state) => state)
-  const countProductInCart: number = cartStore.getCurrentProductCount(product)
+  const countProductInCart: number = cartStore.getProductCount(product)
   const [count, setCount] = useState<number>(0)
 
   useEffect(() => {

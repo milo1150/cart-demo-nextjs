@@ -1,6 +1,7 @@
 import { CartProduct } from '@shared/schema/product'
 import { CartShop } from '@shared/schema/shop'
 import { findShopIndexInCart, findProductInCart } from '@shared/utils/cart'
+import _ from 'lodash'
 import { create } from 'zustand'
 
 export type CartState = {
@@ -10,7 +11,8 @@ export type CartState = {
 export type CartAction = {
   addProduct: (product: CartProduct, inc: number) => void
   increaseProduct: (product: CartProduct, inc: number) => void
-  getCurrentProductCount: (product: CartProduct) => number
+  getProductCount: (product: CartProduct) => number
+  getAllProductCount: () => number
   reset: () => void
 }
 
@@ -70,12 +72,22 @@ const useCartStore = create<CartState & CartAction>()((set, get) => ({
       return { ...state, shops: copyShops }
     })
   },
-  getCurrentProductCount: (product) => {
+  getProductCount: (product) => {
     const findProduct = findProductInCart(get().shops, product)
 
     if (!findProduct.ok) return 0
 
     return (findProduct.product as CartProduct).count
+  },
+  getAllProductCount: () => {
+    const count = _(get().shops)
+      .map((shop) =>
+        _(shop.products)
+          .map((product) => product.count)
+          .sum()
+      )
+      .sum()
+    return count
   },
 }))
 
