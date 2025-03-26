@@ -1,11 +1,20 @@
 import { CartProduct } from '@shared/schema/product'
 import { CartShop } from '@shared/schema/shop'
-import { findShopIndexInCart, findProductInCart } from '@shared/utils/cart'
+import {
+  findShopIndexInCart,
+  findProductInCart,
+  getTotalProductPrice,
+  findShopInCart,
+  setAllCheckedProduct,
+  updateSelectedProductItem,
+  removeSelectedProductItem,
+} from '@shared/utils/cart'
 import _ from 'lodash'
 import { create } from 'zustand'
 
 export type CartState = {
   shops: CartShop[]
+  selectedProducts: CartProduct[]
 }
 
 export type CartAction = {
@@ -14,11 +23,16 @@ export type CartAction = {
   decreaseProduct: (product: CartProduct, amount: number) => void
   getProductCount: (product: CartProduct) => number
   getAllProductCount: () => number
+  getSelectedProductCount: () => number
+  getSelectedProductTotalPrice: () => number
+  setCheckProduct: (product: CartProduct, status: boolean) => void
+  setCheckShop: (shopId: number, status: boolean) => void
   reset: () => void
 }
 
 const initCart: CartState = {
   shops: [],
+  selectedProducts: [],
 }
 
 /**
@@ -28,9 +42,12 @@ const initCart: CartState = {
  */
 const useCartStore = create<CartState & CartAction>()((set, get) => ({
   shops: [],
+  selectedProducts: [],
+
   reset: () => {
     set(initCart)
   },
+
   addProduct: (product, inc) =>
     set((state) => {
       const copyShops = [...state.shops]
@@ -44,6 +61,7 @@ const useCartStore = create<CartState & CartAction>()((set, get) => ({
         copyShops.push({
           id: product.shop.id,
           name: product.shop.name,
+          checked: false,
           products: [product],
         })
       }
@@ -55,6 +73,7 @@ const useCartStore = create<CartState & CartAction>()((set, get) => ({
 
       return { ...state, shops: copyShops }
     }),
+
   increaseProduct: (product, amount) => {
     set((state) => {
       const copyShops = [...state.shops]
@@ -73,6 +92,7 @@ const useCartStore = create<CartState & CartAction>()((set, get) => ({
       return { ...state, shops: copyShops }
     })
   },
+
   decreaseProduct: (product, amount) => {
     set((state) => {
       const copyShops = [...state.shops]
@@ -89,6 +109,7 @@ const useCartStore = create<CartState & CartAction>()((set, get) => ({
       return { ...state, shops: copyShops }
     })
   },
+
   getProductCount: (product) => {
     const findProduct = findProductInCart(get().shops, product)
 
@@ -96,15 +117,67 @@ const useCartStore = create<CartState & CartAction>()((set, get) => ({
 
     return (findProduct.product as CartProduct).count
   },
+
   getAllProductCount: () => {
-    const count = _(get().shops)
+    return _(get().shops)
       .map((shop) =>
         _(shop.products)
           .map((product) => product.count)
           .sum()
       )
       .sum()
-    return count
+  },
+
+  getSelectedProductCount: () => get().selectedProducts.length,
+
+  getSelectedProductTotalPrice: () =>
+    _(get().selectedProducts)
+      .map((product) => getTotalProductPrice(product.price, product.count))
+      .sum(),
+
+  setCheckProduct: (product, status) => {
+    set((state) => {
+      const copyState = { ...state }
+      const findProduct = findProductInCart(state.shops, product)
+
+      if (!findProduct.ok) return state
+
+      // Handle product check
+      copyState.shops[findProduct.shopIndex].products[findProduct.productIndex].checked = status
+
+      // Handle shop checked
+      const productsInShop = copyState.shops[findProduct.shopIndex].products
+      const isAllChecked: boolean = productsInShop.every((product) => product.checked)
+      copyState.shops[findProduct.shopIndex].checked = isAllChecked
+
+      // Handle Selected Products
+      copyState.selectedProducts = status
+        ? updateSelectedProductItem(state.selectedProducts, product)
+        : removeSelectedProductItem(state.selectedProducts, product)
+
+      return { ...copyState }
+    })
+  },
+
+  setCheckShop: (shopId, status) => {
+    set((state) => {
+      const copyState = { ...state }
+      const findShop = findShopInCart(state.shops, shopId)
+
+      // Handle shop checked
+      copyState.shops[findShop.shopIndex].checked = status
+
+      // Handle product checked
+      const products = copyState.shops[findShop.shopIndex].products
+      copyState.shops[findShop.shopIndex].products = setAllCheckedProduct(products, status)
+
+      // Handle Selected Products
+      copyState.selectedProducts = status
+        ? updateSelectedProductItem(state.selectedProducts, products)
+        : removeSelectedProductItem(state.selectedProducts, products)
+
+      return copyState
+    })
   },
 }))
 

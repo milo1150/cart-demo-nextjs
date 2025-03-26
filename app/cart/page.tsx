@@ -2,7 +2,7 @@
 
 import ShareLayout from '@shared/layout'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Card, Col, Divider, Row } from 'antd'
+import { Button, Card, Checkbox, Col, Divider, Row } from 'antd'
 import { StyleProvider } from '@ant-design/cssinjs'
 import { useCartStore } from '@shared/store/cart'
 import { CartProduct } from '@shared/schema/product'
@@ -10,19 +10,28 @@ import Image from 'next/image'
 import QuantityStepper from '@shared/component/QuantityStepper'
 import { getTotalProductPrice } from '@shared/utils/cart'
 import { DeleteOutlined } from '@ant-design/icons'
+import { Footer } from 'antd/es/layout/layout'
 
 const queryClient = new QueryClient()
 
 const Cart: React.FC = () => {
   const cartStore = useCartStore((state) => state)
-  console.log(cartStore.shops)
 
   return (
     <ShareLayout>
-      <Row className="pt-4!">
+      <Row className="pt-4! justify-center">
         {cartStore.shops.map((shop) => {
           return (
-            <Card key={shop.id} title={shop.name} variant="borderless" className="w-full mb-4!">
+            <Card key={shop.id} variant="borderless" className="w-full mb-4!">
+              <Row className="gap-2 text-center">
+                <Checkbox
+                  checked={shop.checked}
+                  onChange={(e) => cartStore.setCheckShop(shop.id, e.target.checked)}
+                ></Checkbox>
+                <p className="text-xl font-bold">{shop.name}</p>
+              </Row>
+              <Divider className="my-3!" />
+
               {shop.products.map((product, index) => {
                 return (
                   <div key={product.id}>
@@ -34,8 +43,25 @@ const Cart: React.FC = () => {
             </Card>
           )
         })}
+        <CartSummary />
       </Row>
     </ShareLayout>
+  )
+}
+
+const CartSummary = () => {
+  const totalItems = useCartStore((state) => state.getSelectedProductCount())
+  const totalPrice = useCartStore((state) => state.getSelectedProductTotalPrice())
+
+  return (
+    <Footer className="fixed bottom-0 bg-blue-500! w-full! max-w-screen-lg! rounded-tl-lg rounded-tr-lg py-3! px-3!">
+      <Row className="gap-4 justify-end items-center">
+        <p className="text-xl font-bold">
+          Total ({totalItems} items): ${totalPrice}
+        </p>
+        <Button className="border-blue-300! bg-blue-300! font-bold! text-md!">CHECKOUT</Button>
+      </Row>
+    </Footer>
   )
 }
 
@@ -49,7 +75,11 @@ const Product: React.FC<ProductProps> = ({ product }) => {
   return (
     <Card key={product.id} className="w-full" variant="borderless">
       <Row gutter={12} className="items-center">
-        <Col span={4}>
+        <Col span={4} className="flex! gap-2">
+          <Checkbox
+            checked={product.checked}
+            onChange={(e) => cartStore.setCheckProduct(product, e.target.checked)}
+          ></Checkbox>
           <Image
             src={product.imageUrl || ''}
             width={100}

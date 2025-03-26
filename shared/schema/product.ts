@@ -26,5 +26,6 @@ export type CartProduct = {
   imageUrl: string
   shop: ShopResponse
 
+  checked: boolean
   count: number
 }

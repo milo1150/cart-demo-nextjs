@@ -8,5 +8,6 @@ export interface ShopResponse {
 export interface CartShop {
   id: number
   name: string
+  checked: boolean
   products: CartProduct[]
 }

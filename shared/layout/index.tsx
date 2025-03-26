@@ -4,7 +4,12 @@ import React from 'react'
 import { ConfigProvider, Layout, theme } from 'antd'
 import AppHeader from '@/shared/component/AppHeader'
 
-const ShareLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+type ShareLayoutProps = {
+  children: React.ReactNode
+  footer?: boolean
+}
+
+const ShareLayout: React.FC<ShareLayoutProps> = ({ children }) => {
   const { Header, Content } = Layout
   const layoutStyle: React.CSSProperties = {}
 

@@ -13,5 +13,6 @@ export function transformCartProduct(item: ProductResponse): CartProduct {
     stock: item.stock,
     imageUrl: item.image_url,
     count: 0,
+    checked: false,
   }
 }
