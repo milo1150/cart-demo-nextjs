@@ -10,7 +10,8 @@ export type CartState = {
 
 export type CartAction = {
   addProduct: (product: CartProduct, inc: number) => void
-  increaseProduct: (product: CartProduct, inc: number) => void
+  increaseProduct: (product: CartProduct, amount: number) => void
+  decreaseProduct: (product: CartProduct, amount: number) => void
   getProductCount: (product: CartProduct) => number
   getAllProductCount: () => number
   reset: () => void
@@ -54,19 +55,35 @@ const useCartStore = create<CartState & CartAction>()((set, get) => ({
 
       return { ...state, shops: copyShops }
     }),
-  increaseProduct: (product, inc) => {
+  increaseProduct: (product, amount) => {
     set((state) => {
       const copyShops = [...state.shops]
       const findProduct = findProductInCart(copyShops, product)
 
       if (findProduct.ok) {
-        copyShops[findProduct.shopIndex].products[findProduct.productIndex].count += inc
+        copyShops[findProduct.shopIndex].products[findProduct.productIndex].count += amount
       }
 
       // Prevent add item over current stock
       const count = copyShops[findProduct.shopIndex].products[findProduct.productIndex].count
       if (count > product.stock) {
         copyShops[findProduct.shopIndex].products[findProduct.productIndex].count = product.stock
+      }
+
+      return { ...state, shops: copyShops }
+    })
+  },
+  decreaseProduct: (product, amount) => {
+    set((state) => {
+      const copyShops = [...state.shops]
+      const findProduct = findProductInCart(copyShops, product)
+
+      if (findProduct.product?.count === 1) {
+        return { ...state }
+      }
+
+      if (findProduct.ok) {
+        copyShops[findProduct.shopIndex].products[findProduct.productIndex].count -= amount
       }
 
       return { ...state, shops: copyShops }

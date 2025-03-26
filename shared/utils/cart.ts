@@ -34,3 +34,7 @@ export function findShopInCart(shops: CartShop[], shopId: number): boolean {
 export function findShopIndexInCart(shops: CartShop[], shopId: number): number {
   return shops.findIndex((shop) => shop.id === shopId)
 }
+
+export function getTotalProductPrice(price: number, count: number): number {
+  return price * count
+}

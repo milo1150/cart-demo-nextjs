@@ -1,11 +1,12 @@
 'use client'
 
-import { Card, Button, ConfigProvider, Input, Badge } from 'antd'
+import { Card, Button, ConfigProvider, Badge } from 'antd'
 import { ShoppingCartOutlined } from '@ant-design/icons'
 import { useCartStore } from '@shared/store/cart'
 import { CartProduct } from '@shared/schema/product'
 import { useEffect, useState } from 'react'
 import { findProductInCart } from '@shared/utils/cart'
+import QuantityStepper from './QuantityStepper'
 
 type ProductCardActionButtonProps = {
   product: CartProduct
@@ -51,20 +52,18 @@ const ProductCardActionButton: React.FC<ProductCardActionButtonProps> = ({ produ
   }
 
   return (
-    <div className="flex justify-end gap-1 mt-2">
-      <Button className="w-1!" onClick={() => decreaseCount()}>
-        -
-      </Button>
-      <Input className="w-10! pointer-events-none justify-items-center" value={count} />
-      <Button className="w-1!" onClick={() => increaseCount()}>
-        +
-      </Button>
+    <div className="flex justify-end mt-2">
+      <QuantityStepper
+        count={count}
+        decreaseCallback={decreaseCount}
+        increaseCallback={increaseCount}
+      />
       <ConfigProvider theme={{ token: { paddingXS: 1 } }}>
         <Badge count={countProductInCart} size="small" offset={[-4, 0]} className="hello-world">
           <Button
             variant="filled"
             shape="default"
-            className="bg-blue-600 hover:bg-blue-700 border-none w-9! flex items-center justify-center"
+            className="bg-blue-600 hover:bg-blue-700 border-none w-9! flex items-center justify-center ml-1"
             icon={<ShoppingCartOutlined className="text-lg!" />}
             onClick={() => onClickAddToCart()}
           />
