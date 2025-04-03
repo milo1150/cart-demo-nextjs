@@ -11,6 +11,7 @@ import {
 } from '@shared/utils/cart'
 import _ from 'lodash'
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 export type CartState = {
   shops: CartShop[]
@@ -40,148 +41,154 @@ const initCart: CartState = {
  * If need to track change in useEffect then wrap with immer()
  * @see https://zustand.docs.pmnd.rs/middlewares/immer
  */
-const useCartStore = create<CartState & CartAction>()((set, get) => ({
-  shops: [],
-  selectedProducts: [],
+const useCartStore = create<CartState & CartAction>()(
+  persist(
+    (set, get) => ({
+      shops: [],
+      selectedProducts: [],
 
-  reset: () => {
-    set(initCart)
-  },
+      reset: () => {
+        set(initCart)
+      },
 
-  addProduct: (product, inc) =>
-    set((state) => {
-      const copyShops = [...state.shops]
-      const shopIndex = findShopIndexInCart(copyShops, product.shop.id)
+      addProduct: (product, inc) =>
+        set((state) => {
+          const copyShops = [...state.shops]
+          const shopIndex = findShopIndexInCart(copyShops, product.shop.id)
 
-      // Set product count
-      product.count = inc
+          // Set product count
+          product.count = inc
 
-      // Not found specific shop
-      if (shopIndex === -1) {
-        copyShops.push({
-          id: product.shop.id,
-          name: product.shop.name,
-          checked: false,
-          products: [product],
+          // Not found specific shop
+          if (shopIndex === -1) {
+            copyShops.push({
+              id: product.shop.id,
+              name: product.shop.name,
+              checked: false,
+              products: [product],
+            })
+          }
+
+          // Found specific shop
+          if (shopIndex >= 0) {
+            copyShops[shopIndex].products.push(product)
+          }
+
+          return { ...state, shops: copyShops }
+        }),
+
+      increaseProduct: (product, amount) => {
+        set((state) => {
+          const copyShops = [...state.shops]
+          const findProduct = findProductInCart(copyShops, product)
+
+          if (findProduct.ok) {
+            copyShops[findProduct.shopIndex].products[findProduct.productIndex].count += amount
+          }
+
+          // Prevent add item over current stock
+          const count = copyShops[findProduct.shopIndex].products[findProduct.productIndex].count
+          if (count > product.stock) {
+            copyShops[findProduct.shopIndex].products[findProduct.productIndex].count =
+              product.stock
+          }
+
+          return { ...state, shops: copyShops }
         })
-      }
+      },
 
-      // Found specific shop
-      if (shopIndex >= 0) {
-        copyShops[shopIndex].products.push(product)
-      }
+      decreaseProduct: (product, amount) => {
+        set((state) => {
+          const copyShops = [...state.shops]
+          const findProduct = findProductInCart(copyShops, product)
 
-      return { ...state, shops: copyShops }
-    }),
+          if (findProduct.product?.count === 1) {
+            return { ...state }
+          }
 
-  increaseProduct: (product, amount) => {
-    set((state) => {
-      const copyShops = [...state.shops]
-      const findProduct = findProductInCart(copyShops, product)
+          if (findProduct.ok) {
+            copyShops[findProduct.shopIndex].products[findProduct.productIndex].count -= amount
+          }
 
-      if (findProduct.ok) {
-        copyShops[findProduct.shopIndex].products[findProduct.productIndex].count += amount
-      }
+          return { ...state, shops: copyShops }
+        })
+      },
 
-      // Prevent add item over current stock
-      const count = copyShops[findProduct.shopIndex].products[findProduct.productIndex].count
-      if (count > product.stock) {
-        copyShops[findProduct.shopIndex].products[findProduct.productIndex].count = product.stock
-      }
+      getProductCount: (product) => {
+        const findProduct = findProductInCart(get().shops, product)
 
-      return { ...state, shops: copyShops }
-    })
-  },
+        if (!findProduct.ok) return 0
 
-  decreaseProduct: (product, amount) => {
-    set((state) => {
-      const copyShops = [...state.shops]
-      const findProduct = findProductInCart(copyShops, product)
+        return (findProduct.product as CartProduct).count
+      },
 
-      if (findProduct.product?.count === 1) {
-        return { ...state }
-      }
-
-      if (findProduct.ok) {
-        copyShops[findProduct.shopIndex].products[findProduct.productIndex].count -= amount
-      }
-
-      return { ...state, shops: copyShops }
-    })
-  },
-
-  getProductCount: (product) => {
-    const findProduct = findProductInCart(get().shops, product)
-
-    if (!findProduct.ok) return 0
-
-    return (findProduct.product as CartProduct).count
-  },
-
-  getAllProductCount: () => {
-    return _(get().shops)
-      .map((shop) =>
-        _(shop.products)
-          .map((product) => product.count)
+      getAllProductCount: () => {
+        return _(get().shops)
+          .map((shop) =>
+            _(shop.products)
+              .map((product) => product.count)
+              .sum()
+          )
           .sum()
-      )
-      .sum()
-  },
+      },
 
-  getSelectedProductCount: () => get().selectedProducts.length,
+      getSelectedProductCount: () => get().selectedProducts.length,
 
-  getSelectedProductTotalPrice: () =>
-    _(get().selectedProducts)
-      .map((product) => getTotalProductPrice(product.price, product.count))
-      .sum(),
+      getSelectedProductTotalPrice: () =>
+        _(get().selectedProducts)
+          .map((product) => getTotalProductPrice(product.price, product.count))
+          .sum(),
 
-  setCheckProduct: (product, status) => {
-    set((state) => {
-      const copyState = { ...state }
-      const findProduct = findProductInCart(state.shops, product)
+      setCheckProduct: (product, status) => {
+        set((state) => {
+          const copyState = { ...state }
+          const findProduct = findProductInCart(state.shops, product)
 
-      if (!findProduct.ok) return state
+          if (!findProduct.ok) return state
 
-      // Handle product check
-      copyState.shops[findProduct.shopIndex].products[findProduct.productIndex].checked = status
+          // Handle product check
+          copyState.shops[findProduct.shopIndex].products[findProduct.productIndex].checked = status
 
-      // Handle shop checked
-      const productsInShop = copyState.shops[findProduct.shopIndex].products
-      const isAllChecked: boolean = productsInShop.every((product) => product.checked)
-      copyState.shops[findProduct.shopIndex].checked = isAllChecked
+          // Handle shop checked
+          const productsInShop = copyState.shops[findProduct.shopIndex].products
+          const isAllChecked: boolean = productsInShop.every((product) => product.checked)
+          copyState.shops[findProduct.shopIndex].checked = isAllChecked
 
-      // Handle Selected Products
-      copyState.selectedProducts = status
-        ? updateSelectedProductItem(state.selectedProducts, product)
-        : removeSelectedProductItem(state.selectedProducts, product)
+          // Handle Selected Products
+          copyState.selectedProducts = status
+            ? updateSelectedProductItem(state.selectedProducts, product)
+            : removeSelectedProductItem(state.selectedProducts, product)
 
-      return { ...copyState }
-    })
-  },
+          return { ...copyState }
+        })
+      },
 
-  setCheckShop: (shopId, status) => {
-    set((state) => {
-      const copyState = { ...state }
-      const findShop = findShopInCart(state.shops, shopId)
+      setCheckShop: (shopId, status) => {
+        set((state) => {
+          const copyState = { ...state }
+          const findShop = findShopInCart(state.shops, shopId)
 
-      // Handle shop checked
-      copyState.shops[findShop.shopIndex].checked = status
+          // Handle shop checked
+          copyState.shops[findShop.shopIndex].checked = status
 
-      // Filter which product should get update
-      const products = copyState.shops[findShop.shopIndex].products
-      const uncheckProducts = products.filter((product) => !product.checked)
+          // Filter which product should get update
+          const products = copyState.shops[findShop.shopIndex].products
+          const uncheckProducts = products.filter((product) => !product.checked)
 
-      // Handle product checked value
-      copyState.shops[findShop.shopIndex].products = setAllCheckedProduct(products, status)
+          // Handle product checked value
+          copyState.shops[findShop.shopIndex].products = setAllCheckedProduct(products, status)
 
-      // Handle Selected Products
-      copyState.selectedProducts = status
-        ? updateSelectedProductItem(state.selectedProducts, uncheckProducts)
-        : removeSelectedProductItem(state.selectedProducts, products)
+          // Handle Selected Products
+          copyState.selectedProducts = status
+            ? updateSelectedProductItem(state.selectedProducts, uncheckProducts)
+            : removeSelectedProductItem(state.selectedProducts, products)
 
-      return copyState
-    })
-  },
-}))
+          return copyState
+        })
+      },
+    }),
+    { name: 'cart-state' }
+  )
+)
 
 export { useCartStore }
