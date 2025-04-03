@@ -28,27 +28,15 @@ export type CreateCheckoutPayload = {
 /**
  * @endpoint /cart/checkout/checkouts
  */
-export interface Item {
+export interface CheckoutPaymentInfo {
   id: number
-  created_at: string
-  updated_at: string
-  checkout_items: CheckoutItem[]
-  payment: Payment
+  status: string
 }
-export interface CheckoutItem {
-  id: number
-  created_at: string
-  updated_at: string
-  deleted_at: never
-  shop: Shop
-  products: Product[]
-  checkout_id: number
-}
-export interface Shop {
+export interface CheckoutShopInfo {
   id: number
   name: string
 }
-export interface Product {
+export interface CheckoutProductInfo {
   id: number
   created_at: string
   updated_at: string
@@ -59,9 +47,21 @@ export interface Product {
   stock: number
   quantity: number
 }
-export interface Payment {
+export interface CheckoutItemInfo {
   id: number
-  status: string
+  created_at: string
+  updated_at: string
+  deleted_at: never
+  shop: CheckoutShopInfo
+  products: CheckoutProductInfo[]
+  checkout_id: number
+}
+export interface Item {
+  id: number
+  created_at: string
+  updated_at: string
+  checkout_items: CheckoutItemInfo[]
+  payment: CheckoutPaymentInfo
 }
 export interface GetCheckoutResponse {
   items: Item[]
