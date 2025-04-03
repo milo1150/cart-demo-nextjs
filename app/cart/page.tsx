@@ -1,7 +1,7 @@
 'use client'
 
 import ShareLayout from '@shared/layout'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query'
 import { Button, Card, Checkbox, Col, Divider, Row } from 'antd'
 import { StyleProvider } from '@ant-design/cssinjs'
 import { useCartStore } from '@shared/store/cart'
@@ -11,6 +11,8 @@ import QuantityStepper from '@shared/component/QuantityStepper'
 import { getTotalProductPrice } from '@shared/utils/cart'
 import { DeleteOutlined } from '@ant-design/icons'
 import { Footer } from 'antd/es/layout/layout'
+import { generateCheckoutPayload } from '@shared/utils/checkout'
+import { createCheckout } from '@shared/api/checkout'
 
 const queryClient = new QueryClient()
 
@@ -52,6 +54,19 @@ const Cart: React.FC = () => {
 const CartSummary = () => {
   const totalItems = useCartStore((state) => state.getSelectedProductCount())
   const totalPrice = useCartStore((state) => state.getSelectedProductTotalPrice())
+  const selectedProducts = useCartStore((state) => state.selectedProducts)
+  const createCheckoutMutation = useMutation({
+    mutationFn: createCheckout,
+    onSuccess(data, variables, context) {
+      // TODO: delete or refactor
+      console.log(data, variables, context)
+    },
+  })
+
+  const checkoutHandler = () => {
+    const payload = generateCheckoutPayload(selectedProducts)
+    createCheckoutMutation.mutate(payload)
+  }
 
   return (
     <Footer className="fixed bottom-0 bg-blue-500! w-full! max-w-screen-lg! rounded-tl-lg rounded-tr-lg py-3! px-3!">
@@ -59,7 +74,12 @@ const CartSummary = () => {
         <p className="text-xl font-bold">
           Total ({totalItems} items): ${totalPrice}
         </p>
-        <Button className="border-blue-300! bg-blue-300! font-bold! text-md!">CHECKOUT</Button>
+        <Button
+          className="border-blue-300! bg-blue-300! font-bold! text-md!"
+          onClick={() => checkoutHandler()}
+        >
+          CHECKOUT
+        </Button>
       </Row>
     </Footer>
   )

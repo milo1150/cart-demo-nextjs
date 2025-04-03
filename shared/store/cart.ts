@@ -28,7 +28,8 @@ export type CartAction = {
   getSelectedProductTotalPrice: () => number
   setCheckProduct: (product: CartProduct, status: boolean) => void
   setCheckShop: (shopId: number, status: boolean) => void
-  reset: () => void
+  resetState: () => void
+  resetSelectedProducts: () => void
 }
 
 const initCart: CartState = {
@@ -47,8 +48,16 @@ const useCartStore = create<CartState & CartAction>()(
       shops: [],
       selectedProducts: [],
 
-      reset: () => {
+      resetState: () => {
         set(initCart)
+      },
+
+      resetSelectedProducts: () => {
+        set((state) => {
+          const copyState = { ...state }
+          copyState.selectedProducts = []
+          return { ...copyState }
+        })
       },
 
       addProduct: (product, inc) =>
@@ -187,7 +196,9 @@ const useCartStore = create<CartState & CartAction>()(
         })
       },
     }),
-    { name: 'cart-state' }
+    {
+      name: 'cart-state',
+    }
   )
 )
 
