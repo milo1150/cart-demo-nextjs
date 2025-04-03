@@ -6,55 +6,72 @@ import ShareLayout from '@shared/layout'
 import { getCheckouts } from '@shared/api/checkout'
 import { Card, Col, Divider, Row } from 'antd'
 import Image from 'next/image'
-import { CheckoutProductInfo, CheckoutShopInfo } from '@shared/schema/checkout'
+import { CheckoutInfo, CheckoutProductInfo, CheckoutShopInfo } from '@shared/schema/checkout'
+import React from 'react'
 
 const queryClient = new QueryClient()
 
-const ProductInfoCard: React.FC<{ productInfo: CheckoutProductInfo }> = ({ productInfo }) => {
+const ProductInfo: React.FC<{ productInfo: CheckoutProductInfo }> = ({ productInfo }) => {
   return (
-    <Card key={productInfo.id} className="w-full" variant="borderless">
-      <Row gutter={12} className="items-center">
-        <Col span={4} className="flex! gap-2">
-          <Image
-            src={productInfo.image_url || ''}
-            width={100}
-            height={100}
-            alt={`Picture of ${productInfo.name}`}
-          />
-        </Col>
-        <Col span={4}>
-          <p className="text-md font-bold">{productInfo.name}</p>
-        </Col>
-        <Col span={4} className="place-items-center">
-          <p className="text-xl font-bold">${productInfo.price}</p>
-        </Col>
-        {/* <Col span={4} className="place-items-center">
-          <p className="text-xl font-bold">${getTotalProductPrice(product.price, product.count)}</p>
-        </Col> */}
-      </Row>
-    </Card>
+    <Row className="w-full py-2 items-center">
+      <Col span={4} className="flex! gap-2">
+        <Image
+          src={productInfo.image_url || ''}
+          width={100}
+          height={100}
+          alt={`Picture of ${productInfo.name}`}
+        />
+      </Col>
+      <Col span={6}>
+        <p className="text-md font-bold">{productInfo.name}</p>
+      </Col>
+      <Col span={14} className="place-items-end">
+        <p className="text-xl font-bold">${productInfo.price}</p>
+      </Col>
+    </Row>
   )
 }
 
-const ShopInfoCard: React.FC<{
+const ShopInfo: React.FC<{
   shopInfo: CheckoutShopInfo
   productsInfo: CheckoutProductInfo[]
 }> = ({ shopInfo, productsInfo }) => {
   return (
-    <Card key={shopInfo.id} variant="borderless" className="w-full mb-4!">
+    <Row className="w-full pt-4">
       <Row className="gap-2 text-center">
-        <p className="text-xl font-bold">{shopInfo.name}</p>
+        <p className="text-lg font-bold">{shopInfo.name}</p>
       </Row>
       <Divider className="my-3!" />
-
-      {productsInfo.map((productInfo, index) => {
+      {productsInfo.map((productInfo) => {
         return (
-          <div key={productInfo.id}>
-            <ProductInfoCard key={productInfo.id} productInfo={productInfo} />
-            {index !== productsInfo.length - 1 && <Divider className="my-0!" />}
-          </div>
+          <Row key={productInfo.id} className="w-full!">
+            <ProductInfo key={productInfo.id} productInfo={productInfo} />
+          </Row>
         )
       })}
+    </Row>
+  )
+}
+
+const CheckoutInfoCard: React.FC<{ checkout: CheckoutInfo }> = ({ checkout }) => {
+  return (
+    <Card key={'checout_card' + checkout.id} className="w-full">
+      <Row key={'checkout_row' + checkout.id} className="w-full">
+        <div className="pb-2">
+          <p className="text-xl font-bold">Order #{checkout.id}</p>
+        </div>
+        {checkout.checkout_items.map((checkoutItem) => {
+          return (
+            <Row key={checkoutItem.id} className="w-full">
+              <ShopInfo
+                key={checkoutItem.id}
+                shopInfo={checkoutItem.shop}
+                productsInfo={checkoutItem.products}
+              />
+            </Row>
+          )
+        })}
+      </Row>
     </Card>
   )
 }
@@ -66,22 +83,15 @@ const Checkout: React.FC = () => {
     retry: true,
     refetchOnWindowFocus: true,
   })
+
   return (
     <ShareLayout>
       <Row gutter={[16, 16]} className="mt-4">
-        {checkoutQuery.data?.items.map((checkout) => {
-          return checkout.checkout_items.map((checkoutItem) => {
-            return (
-              <Col key={checkoutItem.id} span={24}>
-                <ShopInfoCard
-                  key={checkoutItem.id}
-                  shopInfo={checkoutItem.shop}
-                  productsInfo={checkoutItem.products}
-                />
-              </Col>
-            )
-          })
-        })}
+        {checkoutQuery.data?.items
+          .filter((v) => v.checkout_items.length)
+          .map((checkout) => {
+            return <CheckoutInfoCard key={'order_info' + checkout.id} checkout={checkout} />
+          })}
       </Row>
     </ShareLayout>
   )

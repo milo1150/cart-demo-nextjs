@@ -56,7 +56,7 @@ export interface CheckoutItemInfo {
   products: CheckoutProductInfo[]
   checkout_id: number
 }
-export interface Item {
+export interface CheckoutInfo {
   id: number
   created_at: string
   updated_at: string
@@ -64,5 +64,5 @@ export interface Item {
   payment: CheckoutPaymentInfo
 }
 export interface GetCheckoutResponse {
-  items: Item[]
+  items: CheckoutInfo[]
 }
