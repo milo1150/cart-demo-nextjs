@@ -13,83 +13,11 @@ import { DeleteOutlined } from '@ant-design/icons'
 import { Footer } from 'antd/es/layout/layout'
 import { generateCheckoutPayload } from '@shared/utils/checkout'
 import { createCheckout } from '@shared/api/checkout'
+import { CartShop } from '@shared/schema/shop'
 
 const queryClient = new QueryClient()
 
-const Cart: React.FC = () => {
-  const cartStore = useCartStore((state) => state)
-
-  return (
-    <ShareLayout>
-      <Row className="pt-4! justify-center">
-        {cartStore.shops.map((shop) => {
-          return (
-            <Card key={shop.id} variant="borderless" className="w-full mb-4!">
-              <Row className="gap-2 text-center">
-                <Checkbox
-                  checked={shop.checked}
-                  onChange={(e) => cartStore.setCheckShop(shop.id, e.target.checked)}
-                ></Checkbox>
-                <p className="text-xl font-bold">{shop.name}</p>
-              </Row>
-              <Divider className="my-3!" />
-
-              {shop.products.map((product, index) => {
-                return (
-                  <div key={product.id}>
-                    <Product key={product.id} product={product} />
-                    {index !== shop.products.length - 1 && <Divider className="my-0!" />}
-                  </div>
-                )
-              })}
-            </Card>
-          )
-        })}
-        <CartSummary />
-      </Row>
-    </ShareLayout>
-  )
-}
-
-const CartSummary = () => {
-  const totalItems = useCartStore((state) => state.getSelectedProductCount())
-  const totalPrice = useCartStore((state) => state.getSelectedProductTotalPrice())
-  const selectedProducts = useCartStore((state) => state.selectedProducts)
-  const createCheckoutMutation = useMutation({
-    mutationFn: createCheckout,
-    onSuccess(data, variables, context) {
-      // TODO: delete or refactor
-      console.log(data, variables, context)
-    },
-  })
-
-  const checkoutHandler = () => {
-    const payload = generateCheckoutPayload(selectedProducts)
-    createCheckoutMutation.mutate(payload)
-  }
-
-  return (
-    <Footer className="fixed bottom-0 bg-blue-500! w-full! max-w-screen-lg! rounded-tl-lg rounded-tr-lg py-3! px-3!">
-      <Row className="gap-4 justify-end items-center">
-        <p className="text-xl font-bold">
-          Total ({totalItems} items): ${totalPrice}
-        </p>
-        <Button
-          className="border-blue-300! bg-blue-300! font-bold! text-md!"
-          onClick={() => checkoutHandler()}
-        >
-          CHECKOUT
-        </Button>
-      </Row>
-    </Footer>
-  )
-}
-
-type ProductProps = {
-  product: CartProduct
-}
-
-const Product: React.FC<ProductProps> = ({ product }) => {
+const ProductCard: React.FC<{ product: CartProduct }> = ({ product }) => {
   const cartStore = useCartStore((state) => state)
 
   return (
@@ -130,6 +58,81 @@ const Product: React.FC<ProductProps> = ({ product }) => {
         </Col>
       </Row>
     </Card>
+  )
+}
+
+const ShopCard: React.FC<{ shop: CartShop }> = ({ shop }) => {
+  const cartStore = useCartStore((state) => state)
+
+  return (
+    <Card key={shop.id} variant="borderless" className="w-full mb-4!">
+      <Row className="gap-2 text-center">
+        <Checkbox
+          checked={shop.checked}
+          onChange={(e) => cartStore.setCheckShop(shop.id, e.target.checked)}
+        ></Checkbox>
+        <p className="text-xl font-bold">{shop.name}</p>
+      </Row>
+      <Divider className="my-3!" />
+
+      {shop.products.map((product, index) => {
+        return (
+          <div key={product.id}>
+            <ProductCard key={product.id} product={product} />
+            {index !== shop.products.length - 1 && <Divider className="my-0!" />}
+          </div>
+        )
+      })}
+    </Card>
+  )
+}
+
+const CartSummary = () => {
+  const totalItems = useCartStore((state) => state.getSelectedProductCount())
+  const totalPrice = useCartStore((state) => state.getSelectedProductTotalPrice())
+  const selectedProducts = useCartStore((state) => state.selectedProducts)
+  const createCheckoutMutation = useMutation({
+    mutationFn: createCheckout,
+    onSuccess(data, variables, context) {
+      // TODO: delete or refactor
+      console.log(data, variables, context)
+    },
+  })
+
+  const checkoutHandler = () => {
+    const payload = generateCheckoutPayload(selectedProducts)
+    createCheckoutMutation.mutate(payload)
+  }
+
+  return (
+    <Footer className="fixed bottom-0 bg-blue-500! w-full! max-w-screen-lg! rounded-tl-lg rounded-tr-lg py-3! px-3!">
+      <Row className="gap-4 justify-end items-center">
+        <p className="text-xl font-bold">
+          Total ({totalItems} items): ${totalPrice}
+        </p>
+        <Button
+          className="border-blue-300! bg-blue-300! font-bold! text-md!"
+          onClick={() => checkoutHandler()}
+        >
+          CHECKOUT
+        </Button>
+      </Row>
+    </Footer>
+  )
+}
+
+const Cart: React.FC = () => {
+  const cartStore = useCartStore((state) => state)
+
+  return (
+    <ShareLayout>
+      <Row className="pt-4! justify-center">
+        {cartStore.shops.map((shop) => {
+          return <ShopCard key={shop.id} shop={shop} />
+        })}
+        <CartSummary />
+      </Row>
+    </ShareLayout>
   )
 }
 
