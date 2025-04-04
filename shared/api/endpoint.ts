@@ -11,4 +11,12 @@ export const endpoint = {
       add: '/cart/cart-item/add',
     },
   },
+  shopProductService: {
+    product: {
+      getProducts: '/shop-product/product/products',
+    },
+  },
+  user: {
+    login: '/user/login',
+  },
 }
