@@ -1,3 +1,5 @@
+import { PaymentStatus } from './payment'
+
 export type CheckoutProduct = {
   id: number
   created_at: string
@@ -30,7 +32,7 @@ export type CreateCheckoutPayload = {
  */
 export interface CheckoutPaymentInfo {
   id: number
-  status: string
+  status: PaymentStatus
 }
 export interface CheckoutShopInfo {
   id: number
@@ -46,6 +48,7 @@ export interface CheckoutProductInfo {
   price: number
   stock: number
   quantity: number
+  paid_amount: number
 }
 export interface CheckoutItemInfo {
   id: number
@@ -55,6 +58,7 @@ export interface CheckoutItemInfo {
   shop: CheckoutShopInfo
   products: CheckoutProductInfo[]
   checkout_id: number
+  total_paid_amount: number
 }
 export interface CheckoutInfo {
   id: number
@@ -62,6 +66,7 @@ export interface CheckoutInfo {
   updated_at: string
   checkout_items: CheckoutItemInfo[]
   payment: CheckoutPaymentInfo
+  total_paid_amount: number
 }
 export interface GetCheckoutResponse {
   items: CheckoutInfo[]

@@ -4,10 +4,11 @@ import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-quer
 import { StyleProvider } from '@ant-design/cssinjs'
 import ShareLayout from '@shared/layout'
 import { getCheckouts } from '@shared/api/checkout'
-import { Card, Col, Divider, Row } from 'antd'
+import { Badge, Button, Card, Col, Divider, Row } from 'antd'
 import Image from 'next/image'
 import { CheckoutInfo, CheckoutProductInfo, CheckoutShopInfo } from '@shared/schema/checkout'
 import React from 'react'
+import _ from 'lodash'
 
 const queryClient = new QueryClient()
 
@@ -23,10 +24,12 @@ const ProductInfo: React.FC<{ productInfo: CheckoutProductInfo }> = ({ productIn
         />
       </Col>
       <Col span={6}>
-        <p className="text-md font-bold">{productInfo.name}</p>
+        <p className="text-lg font-bold">{productInfo.name}</p>
+        <p className="text-sm">price: ${productInfo.price}</p>
+        <p className="text-sm">quantity: {productInfo.quantity}</p>
       </Col>
       <Col span={14} className="place-items-end">
-        <p className="text-xl font-bold">${productInfo.price}</p>
+        <p className="text-xl font-bold">${productInfo.paid_amount}</p>
       </Col>
     </Row>
   )
@@ -39,7 +42,7 @@ const ShopInfo: React.FC<{
   return (
     <Row className="w-full pt-4">
       <Row className="gap-2 text-center">
-        <p className="text-lg font-bold">{shopInfo.name}</p>
+        <p className="text-xl font-bold">{shopInfo.name}</p>
       </Row>
       <Divider className="my-3!" />
       {productsInfo.map((productInfo) => {
@@ -53,26 +56,38 @@ const ShopInfo: React.FC<{
   )
 }
 
-const CheckoutInfoCard: React.FC<{ checkout: CheckoutInfo }> = ({ checkout }) => {
+const OrderInfoCard: React.FC<{ checkout: CheckoutInfo }> = ({ checkout }) => {
   return (
-    <Card key={'checout_card' + checkout.id} className="w-full">
-      <Row key={'checkout_row' + checkout.id} className="w-full">
-        <div className="pb-2">
-          <p className="text-xl font-bold">Order #{checkout.id}</p>
-        </div>
-        {checkout.checkout_items.map((checkoutItem) => {
-          return (
-            <Row key={checkoutItem.id} className="w-full">
-              <ShopInfo
-                key={checkoutItem.id}
-                shopInfo={checkoutItem.shop}
-                productsInfo={checkoutItem.products}
-              />
-            </Row>
-          )
-        })}
-      </Row>
-    </Card>
+    <Badge.Ribbon
+      text={_.upperCase(checkout.payment.status)}
+      color={checkout.payment.status === 'PENDING' ? 'orange' : 'green'}
+    >
+      <Card className="w-full">
+        <Row className="w-full">
+          <div className="pb-2">
+            <p className="text-xl font-bold">Order #{checkout.id}</p>
+          </div>
+          {checkout.checkout_items.map((checkoutItem) => {
+            return (
+              <Row key={checkoutItem.id} className="w-full">
+                <ShopInfo
+                  key={checkoutItem.id}
+                  shopInfo={checkoutItem.shop}
+                  productsInfo={checkoutItem.products}
+                />
+              </Row>
+            )
+          })}
+          <Divider className="my-3!" />
+          <Row className="w-full justify-end mt-4">
+            <p className="text-2xl font-bold">Total: ${checkout.total_paid_amount}</p>
+            <Button color="primary" variant="outlined" className="ml-3!">
+              Pay
+            </Button>
+          </Row>
+        </Row>
+      </Card>
+    </Badge.Ribbon>
   )
 }
 
@@ -90,7 +105,7 @@ const Checkout: React.FC = () => {
         {checkoutQuery.data?.items
           .filter((v) => v.checkout_items.length)
           .map((checkout) => {
-            return <CheckoutInfoCard key={'order_info' + checkout.id} checkout={checkout} />
+            return <OrderInfoCard key={'order_info' + checkout.id} checkout={checkout} />
           })}
       </Row>
     </ShareLayout>

@@ -18,7 +18,7 @@ const AppHeader: React.FC = () => {
         ICON
       </div>
       <div className="flex gap-4">
-        <Badge count={cartStore.getAllProductCount()} className="border-amber-300!">
+        <Badge count={cartStore.getAllProductCount() || 0} className="border-amber-300!">
           <Button
             color="default"
             variant="filled"
