@@ -1,4 +1,4 @@
-import axios, { CreateAxiosDefaults } from 'axios'
+import axios, { AxiosError, CreateAxiosDefaults } from 'axios'
 import { getCookieByKey } from '../utils/env'
 import { logout } from '../auth/AuthGuard'
 
@@ -34,11 +34,18 @@ axiosInstanceWithAuth.interceptors.request.use(
 // Add a response interceptor (optional for handling errors)
 axiosInstanceWithAuth.interceptors.response.use(
   (response) => response,
-  (error) => {
+  (error: AxiosError) => {
+    if (
+      error.status === 400 &&
+      (error.response?.data as { message: string }).message === 'missing or malformed jwt'
+    ) {
+      console.error('Unauthorized: missing jwt.')
+
+      logout()
+    }
     if (error.response && error.response.status === 401) {
       console.error('Unauthorized: Redirecting to login.')
 
-      // Force logout
       logout()
     }
     return Promise.reject(error)

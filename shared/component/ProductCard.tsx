@@ -22,10 +22,6 @@ const ProductCardActionButton: React.FC<ProductCardActionButtonProps> = ({ produ
   const [count, setCount] = useState<number>(0)
 
   useEffect(() => {
-    console.log(cartStore.shops)
-  }, [cartStore.shops])
-
-  useEffect(() => {
     setCount(1)
   }, [product])
 

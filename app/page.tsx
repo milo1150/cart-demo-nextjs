@@ -1,38 +1,17 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import ShareLayout from '@/shared/layout'
-import SearchInput from '@/shared/component/SearchInput'
 import ProductCard from '@/shared/component/ProductCard'
-import { Row, Col, Button } from 'antd'
-import { QueryClient, QueryClientProvider, useMutation, useQuery } from '@tanstack/react-query'
+import { Row, Col } from 'antd'
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { getProducts, GetProductsQueryparams } from '@/shared/api/product'
-import { login } from '@/shared/api/user'
 import { transformCartProduct } from '@shared/dto/product'
 
 // Create a client
 const queryClient = new QueryClient()
 
-// FIXME: move to custom hook
-const UserLogin = () => {
-  const userQuery = useMutation({
-    mutationFn: login,
-    onSuccess: (res) => {
-      console.log(res)
-    },
-  })
-  // const authQuery = useQuery({ queryKey: ['auth'], queryFn: auth, retry: false })
-
-  useEffect(() => {
-    userQuery.mutate({ username: 'a', pwd: 'a' })
-  }, [])
-
-  return { userQuery }
-}
-
 const Home: React.FC = () => {
-  const {} = UserLogin() // FIXME: remove
-
   const params: GetProductsQueryparams = { page_size: 20 }
   const productQuery = useQuery({
     queryKey: ['product', params],
@@ -44,19 +23,12 @@ const Home: React.FC = () => {
     },
   })
 
-  const fetchProduct = () => {
-    productQuery.refetch()
-  }
-
   return (
     <ShareLayout>
       <div className="pt-4">
-        <div className="pb-1">
+        {/* <div className="pb-1">
           <SearchInput />
-        </div>
-
-        {/* TODO: delete */}
-        <Button onClick={fetchProduct}>fetch product</Button>
+        </div> */}
 
         <Row gutter={[16, 16]} className="mt-4">
           {productQuery.data?.map((product) => {
