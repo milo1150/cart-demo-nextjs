@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Badge, Button } from 'antd'
-import { ShoppingOutlined, UserOutlined, ShoppingCartOutlined } from '@ant-design/icons'
+import { UserOutlined, ShoppingCartOutlined, InboxOutlined } from '@ant-design/icons'
 import { useCartStore } from '@shared/store/cart'
 import { useRouter } from 'next/navigation'
 import { userCheckoutStore } from '@shared/store/checkout'
@@ -24,7 +24,7 @@ const AppHeader: React.FC = () => {
             color="default"
             variant="filled"
             className="bg-blue-500! rounded-2xl! h-10! w-10!"
-            icon={<ShoppingOutlined className="text-2xl!" />}
+            icon={<ShoppingCartOutlined className="text-2xl!" />}
             onClick={() => router.push('/cart')}
           ></Button>
         </Badge>
@@ -33,7 +33,7 @@ const AppHeader: React.FC = () => {
             color="default"
             variant="filled"
             className="bg-blue-500! rounded-2xl! h-10! w-10!"
-            icon={<ShoppingCartOutlined className="text-2xl!" />}
+            icon={<InboxOutlined className="text-2xl!" />}
             onClick={() => router.push('/checkout')}
           ></Button>
         </Badge>
