@@ -65,7 +65,7 @@ export interface CheckoutInfo {
   created_at: string
   updated_at: string
   checkout_items: CheckoutItemInfo[]
-  payment: CheckoutPaymentInfo
+  payment: CheckoutPaymentInfo | null
   total_paid_amount: number
 }
 export interface GetCheckoutResponse {

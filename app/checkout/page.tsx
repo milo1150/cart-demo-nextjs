@@ -1,6 +1,6 @@
 'use client'
 
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider, useMutation, useQuery } from '@tanstack/react-query'
 import { StyleProvider } from '@ant-design/cssinjs'
 import ShareLayout from '@shared/layout'
 import { getCheckouts } from '@shared/api/checkout'
@@ -9,6 +9,7 @@ import Image from 'next/image'
 import { CheckoutInfo, CheckoutProductInfo, CheckoutShopInfo } from '@shared/schema/checkout'
 import React from 'react'
 import _ from 'lodash'
+import { confirmPayment } from '@shared/api/payment'
 
 const queryClient = new QueryClient()
 
@@ -57,37 +58,58 @@ const ShopInfo: React.FC<{
 }
 
 const OrderInfoCard: React.FC<{ checkout: CheckoutInfo }> = ({ checkout }) => {
-  return (
-    <Badge.Ribbon
-      text={_.upperCase(checkout.payment.status)}
-      color={checkout.payment.status === 'PENDING' ? 'orange' : 'green'}
-    >
-      <Card className="w-full">
-        <Row className="w-full">
-          <div className="pb-2">
-            <p className="text-xl font-bold">Order #{checkout.id}</p>
-          </div>
-          {checkout.checkout_items.map((checkoutItem) => {
-            return (
-              <Row key={checkoutItem.id} className="w-full">
-                <ShopInfo
-                  key={checkoutItem.id}
-                  shopInfo={checkoutItem.shop}
-                  productsInfo={checkoutItem.products}
-                />
-              </Row>
-            )
-          })}
-          <Divider className="my-3!" />
-          <Row className="w-full justify-end mt-4">
-            <p className="text-2xl font-bold">Total: ${checkout.total_paid_amount}</p>
-            <Button color="primary" variant="outlined" className="ml-3!">
+  const confirmPaymentMutation = useMutation({
+    mutationFn: confirmPayment,
+  })
+
+  const confirmPaymentHandler = () => {
+    confirmPaymentMutation.mutate(checkout.id)
+  }
+
+  const content = (
+    <Card className="w-full">
+      <Row className="w-full">
+        <div className="pb-2">
+          <p className="text-xl font-bold">Order #{checkout.id}</p>
+        </div>
+        {checkout.checkout_items.map((checkoutItem) => {
+          return (
+            <Row key={checkoutItem.id} className="w-full">
+              <ShopInfo
+                key={checkoutItem.id}
+                shopInfo={checkoutItem.shop}
+                productsInfo={checkoutItem.products}
+              />
+            </Row>
+          )
+        })}
+        <Divider className="my-3!" />
+        <Row className="w-full justify-end mt-4">
+          <p className="text-2xl font-bold">Total: ${checkout.total_paid_amount}</p>
+          {checkout.payment?.status !== 'COMPLETED' && (
+            <Button
+              color="primary"
+              variant="outlined"
+              className="ml-3!"
+              onClick={() => confirmPaymentHandler()}
+            >
               Pay
             </Button>
-          </Row>
+          )}
         </Row>
-      </Card>
+      </Row>
+    </Card>
+  )
+
+  return checkout?.payment ? (
+    <Badge.Ribbon
+      text={_.upperCase(checkout.payment?.status)}
+      color={checkout.payment?.status === 'PENDING' ? 'orange' : 'green'}
+    >
+      {content}
     </Badge.Ribbon>
+  ) : (
+    content
   )
 }
 

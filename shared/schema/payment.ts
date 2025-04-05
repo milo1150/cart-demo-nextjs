@@ -1,1 +1,1 @@
-export type PaymentStatus = 'PENDING' | 'DONE'
+export type PaymentStatus = 'PENDING' | 'COMPLETED'

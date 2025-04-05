@@ -19,4 +19,7 @@ export const endpoint = {
   user: {
     login: '/user/login',
   },
+  payment: {
+    updatePayment: '/payment/order/confirm',
+  },
 }
