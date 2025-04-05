@@ -1,4 +1,6 @@
-import { useEffect, type ReactNode } from 'react'
+'use client'
+
+import { useEffect, useState, type ReactNode } from 'react'
 import type React from 'react'
 import { getCookieByKey, deleteCookie } from '@/shared/utils/env'
 import { loginUrl } from '@/shared/utils/location'
@@ -8,13 +10,16 @@ type GuardProps = {
 }
 
 export const AuthGuard: React.FC<GuardProps> = ({ children }) => {
-  const loginToken = getCookieByKey('j')
+  const [loginToken, setLoginToken] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!loginToken) {
+    const token = getCookieByKey('j')
+    setLoginToken(token)
+
+    if (!token) {
       window.location.href = loginUrl()
     }
-  })
+  }, [])
 
   if (!loginToken) {
     return null
