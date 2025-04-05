@@ -22,6 +22,7 @@ const ProductInfo: React.FC<{ productInfo: CheckoutProductInfo }> = ({ productIn
           width={100}
           height={100}
           alt={`Picture of ${productInfo.name}`}
+          className="rounded-xl"
         />
       </Col>
       <Col span={6}>
@@ -67,7 +68,7 @@ const OrderInfoCard: React.FC<{ checkout: CheckoutInfo }> = ({ checkout }) => {
   }
 
   const content = (
-    <Card className="w-full">
+    <Card className="w-full rounded-2xl! border-none! shadow-none!">
       <Row className="w-full">
         <div className="pb-2">
           <p className="text-xl font-bold">Order #{checkout.id}</p>

@@ -21,7 +21,7 @@ const ProductCard: React.FC<{ product: CartProduct }> = ({ product }) => {
   const cartStore = useCartStore((state) => state)
 
   return (
-    <Card key={product.id} className="w-full" variant="borderless">
+    <Card key={product.id} className="w-full border-none! shadow-none!" variant="borderless">
       <Row gutter={12} className="items-center">
         <Col span={4} className="flex! gap-2">
           <Checkbox
@@ -33,6 +33,7 @@ const ProductCard: React.FC<{ product: CartProduct }> = ({ product }) => {
             width={100}
             height={100}
             alt={`Picture of ${product.name}`}
+            className="rounded-xl"
           />
         </Col>
         <Col span={4}>
@@ -65,7 +66,11 @@ const ShopCard: React.FC<{ shop: CartShop }> = ({ shop }) => {
   const cartStore = useCartStore((state) => state)
 
   return (
-    <Card key={shop.id} variant="borderless" className="w-full mb-4!">
+    <Card
+      key={shop.id}
+      variant="borderless"
+      className="w-full mb-4! rounded-2xl! border-none! shadow-none!"
+    >
       <Row className="gap-2 text-center">
         <Checkbox
           checked={shop.checked}
@@ -126,7 +131,7 @@ const Cart: React.FC = () => {
 
   return (
     <ShareLayout>
-      <Row className="pt-4! justify-center">
+      <Row className="pt-4! justify-center mb-20">
         {cartStore.shops.map((shop) => {
           return <ShopCard key={shop.id} shop={shop} />
         })}
