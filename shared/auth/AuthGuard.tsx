@@ -7,7 +7,7 @@ type GuardProps = {
   children: ReactNode
 }
 
-export const AdminGuard: React.FC<GuardProps> = ({ children }) => {
+export const AuthGuard: React.FC<GuardProps> = ({ children }) => {
   const loginToken = getCookieByKey('j')
 
   useEffect(() => {

@@ -35,7 +35,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      {/* TODO: background dynamic with antd dark mode theme */}
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black! h-auto`}>
         <AntdRegistry>{children}</AntdRegistry>
       </body>
