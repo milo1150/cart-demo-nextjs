@@ -22,7 +22,7 @@ const Login = () => {
       router.push('/')
     },
     onError: (error: AxiosError) => {
-      console.log(error)
+      console.error(error)
 
       deleteCookie('j')
 

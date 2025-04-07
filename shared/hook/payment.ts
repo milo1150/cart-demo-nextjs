@@ -2,6 +2,7 @@ import { confirmPayment } from '@shared/api/payment'
 import { GetCheckoutResponse } from '@shared/schema/checkout'
 import { QueryObserverResult, useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
+
 type UseConfirmPaymentModalProp = {
   fetchCheckout: () => Promise<QueryObserverResult<GetCheckoutResponse, Error>>
 }
@@ -22,7 +23,6 @@ export const useConfirmPaymentModal = ({ fetchCheckout }: UseConfirmPaymentModal
   const confirmPaymentMutation = useMutation({
     mutationFn: confirmPayment,
     onSuccess: async () => {
-      console.log('OK')
       setOpenPaymentModal(false)
       await fetchCheckout()
     },

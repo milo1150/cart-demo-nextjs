@@ -6,7 +6,6 @@ export async function createCheckout(payload: CreateCheckoutPayload) {
   return await axiosInstanceWithAuth
     .post(endpoint.cartService.checkout.create, payload)
     .then((res) => {
-      console.log(res)
       return res
     })
     .catch((err) => {
@@ -18,7 +17,6 @@ export async function getCheckouts(): Promise<GetCheckoutResponse> {
   return await axiosInstanceWithAuth
     .get<GetCheckoutResponse>(endpoint.cartService.checkout.getCheckouts)
     .then((res) => {
-      console.log(res)
       return res.data
     })
     .catch((err) => {

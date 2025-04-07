@@ -14,6 +14,7 @@ import { Footer } from 'antd/es/layout/layout'
 import { generateCheckoutPayload } from '@shared/utils/checkout'
 import { createCheckout } from '@shared/api/checkout'
 import { CartShop } from '@shared/schema/shop'
+import { useRouter } from 'next/navigation'
 
 const queryClient = new QueryClient()
 
@@ -93,14 +94,14 @@ const ShopCard: React.FC<{ shop: CartShop }> = ({ shop }) => {
 }
 
 const CartSummary = () => {
+  const router = useRouter()
   const totalItems = useCartStore((state) => state.getSelectedProductCount())
   const totalPrice = useCartStore((state) => state.getSelectedProductTotalPrice())
   const selectedProducts = useCartStore((state) => state.selectedProducts)
   const createCheckoutMutation = useMutation({
     mutationFn: createCheckout,
-    onSuccess(data, variables, context) {
-      // TODO: delete or refactor
-      console.log(data, variables, context)
+    onSuccess() {
+      router.push('/checkout')
     },
   })
 
