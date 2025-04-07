@@ -65,8 +65,8 @@ type OrderInfoCardProp = {
 
 const OrderInfoCard: React.FC<OrderInfoCardProp> = ({ checkout, showPaymentModal }) => {
   const content = (
-    <Card className="w-full rounded-2xl! border-none! shadow-none!">
-      <Row className="w-full">
+    <Card className="w-full! rounded-2xl! border-none! shadow-none!">
+      <Row className="w-full!">
         <div className="pb-2">
           <p className="text-xl font-bold">Order #{checkout.id}</p>
         </div>
@@ -123,7 +123,7 @@ const Checkout: React.FC = () => {
 
   return (
     <ShareLayout>
-      <Row gutter={[16, 16]} className="mt-4">
+      <Row gutter={[16, 16]} className="mt-4 w-full!">
         {checkoutQuery.data?.items
           .filter((v) => v.checkout_items.length)
           .map((checkout) => {

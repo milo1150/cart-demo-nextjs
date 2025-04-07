@@ -103,7 +103,7 @@ const CartSummary = () => {
 
   const createCheckoutMutation = useMutation({
     mutationFn: createCheckout,
-    onSuccess: () => {
+    onSuccess: async () => {
       router.push('/checkout')
       cartStore.resetSelectedProducts()
     },
