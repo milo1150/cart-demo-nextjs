@@ -55,7 +55,18 @@ const useCartStore = create<CartState & CartAction>()(
       resetSelectedProducts: () => {
         set((state) => {
           const copyState = { ...state }
+
+          // Clear selected item in shops
+          copyState.shops.forEach((shop) => {
+            shop.checked = false
+            shop.products.forEach((product) => {
+              product.checked = false
+            })
+          })
+
+          // Clear selectedProducts
           copyState.selectedProducts = []
+
           return { ...copyState }
         })
       },

@@ -95,13 +95,17 @@ const ShopCard: React.FC<{ shop: CartShop }> = ({ shop }) => {
 
 const CartSummary = () => {
   const router = useRouter()
+
   const totalItems = useCartStore((state) => state.getSelectedProductCount())
   const totalPrice = useCartStore((state) => state.getSelectedProductTotalPrice())
   const selectedProducts = useCartStore((state) => state.selectedProducts)
+  const cartStore = useCartStore((state) => state)
+
   const createCheckoutMutation = useMutation({
     mutationFn: createCheckout,
-    onSuccess() {
+    onSuccess: () => {
       router.push('/checkout')
+      cartStore.resetSelectedProducts()
     },
   })
 
