@@ -1,6 +1,6 @@
 'use client'
 
-import { QueryClient, QueryClientProvider, useMutation, useQuery } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { StyleProvider } from '@ant-design/cssinjs'
 import ShareLayout from '@shared/layout'
 import { getCheckouts } from '@shared/api/checkout'
@@ -9,7 +9,8 @@ import Image from 'next/image'
 import { CheckoutInfo, CheckoutProductInfo, CheckoutShopInfo } from '@shared/schema/checkout'
 import React from 'react'
 import _ from 'lodash'
-import { confirmPayment } from '@shared/api/payment'
+import ConfirmPaymentModal from '@shared/component/ConfirmPaymentModal'
+import { useConfirmPaymentModal } from '@shared/hook/payment'
 
 const queryClient = new QueryClient()
 
@@ -57,16 +58,12 @@ const ShopInfo: React.FC<{
     </Row>
   )
 }
+type OrderInfoCardProp = {
+  checkout: CheckoutInfo
+  showPaymentModal: (checkoutId: number) => void
+}
 
-const OrderInfoCard: React.FC<{ checkout: CheckoutInfo }> = ({ checkout }) => {
-  const confirmPaymentMutation = useMutation({
-    mutationFn: confirmPayment,
-  })
-
-  const confirmPaymentHandler = () => {
-    confirmPaymentMutation.mutate(checkout.id)
-  }
-
+const OrderInfoCard: React.FC<OrderInfoCardProp> = ({ checkout, showPaymentModal }) => {
   const content = (
     <Card className="w-full rounded-2xl! border-none! shadow-none!">
       <Row className="w-full">
@@ -92,7 +89,7 @@ const OrderInfoCard: React.FC<{ checkout: CheckoutInfo }> = ({ checkout }) => {
               color="primary"
               variant="outlined"
               className="ml-3!"
-              onClick={() => confirmPaymentHandler()}
+              onClick={() => showPaymentModal(checkout.id)}
             >
               Pay
             </Button>
@@ -121,6 +118,8 @@ const Checkout: React.FC = () => {
     retry: true,
     refetchOnWindowFocus: true,
   })
+  const { openPaymentModal, showPaymentModal, confirmPaymentHandler, hidePaymentModal } =
+    useConfirmPaymentModal({ fetchCheckout: checkoutQuery.refetch })
 
   return (
     <ShareLayout>
@@ -128,9 +127,23 @@ const Checkout: React.FC = () => {
         {checkoutQuery.data?.items
           .filter((v) => v.checkout_items.length)
           .map((checkout) => {
-            return <OrderInfoCard key={'order_info' + checkout.id} checkout={checkout} />
+            return (
+              <OrderInfoCard
+                key={'order_info' + checkout.id}
+                checkout={checkout}
+                showPaymentModal={showPaymentModal}
+              />
+            )
           })}
       </Row>
+
+      <ConfirmPaymentModal
+        open={openPaymentModal}
+        handleCancel={hidePaymentModal}
+        handleOk={confirmPaymentHandler}
+        title="Confirm Payment"
+        subtitle="Please review and confirm your payment details before proceeding."
+      />
     </ShareLayout>
   )
 }
