@@ -48,6 +48,9 @@ export function logout() {
   // Remove login token
   deleteCookie('j')
 
+  // Remove cart uuid
+  deleteCookie('c_id')
+
   // Redirect to login page
   window.location.href = loginUrl()
 }

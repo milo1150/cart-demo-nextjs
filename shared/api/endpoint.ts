@@ -1,7 +1,10 @@
 export const endpoint = {
   cartService: {
     cart: {
-      getCart: '/cart',
+      getCartDetail: '/cart',
+      getCartUuid: '/cart/get-cart',
+      addItems: '/cart/cart-item/add',
+      removeItem: '/cart/cart-item/remove',
     },
     checkout: {
       create: '/cart/checkout/create',

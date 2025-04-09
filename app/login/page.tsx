@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { login } from '@shared/api/user'
 import { AxiosError } from 'axios'
 import { deleteCookie } from '@shared/utils/env'
+import { getCartUuid } from '@shared/api/cart'
 
 const queryClient = new QueryClient()
 
@@ -17,8 +18,11 @@ const Login = () => {
   const [password, setPassword] = useState('')
   const userQuery = useMutation({
     mutationFn: login,
-    onSuccess: () => {
+    onSuccess: async () => {
       message.success('Login submitted', 1)
+
+      await getCartUuid()
+
       router.push('/')
     },
     onError: (error: AxiosError) => {
