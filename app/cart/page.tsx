@@ -1,7 +1,7 @@
 'use client'
 
 import ShareLayout from '@shared/layout'
-import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider, useMutation, useQuery } from '@tanstack/react-query'
 import { Button, Card, Checkbox, Col, Divider, Row } from 'antd'
 import { StyleProvider } from '@ant-design/cssinjs'
 import { useCartStore } from '@shared/store/cart'
@@ -15,11 +15,16 @@ import { generateCheckoutPayload } from '@shared/utils/checkout'
 import { createCheckout } from '@shared/api/checkout'
 import { CartShop } from '@shared/schema/shop'
 import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { getCartDetail } from '@shared/api/cart'
+import { getCookieByKey } from '@shared/utils/env'
+import { useAddItemToCart } from '@shared/hook/cart'
 
 const queryClient = new QueryClient()
 
 const ProductCard: React.FC<{ product: CartProduct }> = ({ product }) => {
   const cartStore = useCartStore((state) => state)
+  const { onClickIncreaseItem, onClickDecreaseItem } = useAddItemToCart()
 
   return (
     <Card key={product.id} className="w-full border-none! shadow-none!" variant="borderless">
@@ -46,8 +51,8 @@ const ProductCard: React.FC<{ product: CartProduct }> = ({ product }) => {
         <Col span={4}>
           <QuantityStepper
             count={product.count}
-            decreaseCallback={() => cartStore.decreaseProduct(product, 1)}
-            increaseCallback={() => cartStore.increaseProduct(product, 1)}
+            decreaseCallback={() => onClickDecreaseItem(product, 1)}
+            increaseCallback={() => onClickIncreaseItem(product, 1)}
             limit={product.stock}
             displayLimit={true}
           />
@@ -133,6 +138,27 @@ const CartSummary = () => {
 
 const Cart: React.FC = () => {
   const cartStore = useCartStore((state) => state)
+  const [cartUuid, setCartUuid] = useState<string>('')
+
+  const cartDetailQuery = useQuery({
+    queryKey: ['cart-detail'],
+    queryFn: () => getCartDetail(cartUuid),
+    enabled: false,
+  })
+
+  useEffect(() => {
+    if (cartUuid) {
+      cartDetailQuery.refetch()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartUuid])
+
+  useEffect(() => {
+    const cartUuid = getCookieByKey('c_id')
+    if (cartUuid) {
+      setCartUuid(cartUuid)
+    }
+  }, [])
 
   return (
     <ShareLayout>

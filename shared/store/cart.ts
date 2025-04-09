@@ -30,6 +30,7 @@ export type CartAction = {
   setCheckShop: (shopId: number, status: boolean) => void
   resetState: () => void
   resetSelectedProducts: () => void
+  getAllProduct: () => CartProduct[]
 }
 
 const initCart: CartState = {
@@ -205,6 +206,14 @@ const useCartStore = create<CartState & CartAction>()(
 
           return copyState
         })
+      },
+
+      getAllProduct: () => {
+        const cartProducts = _(get().shops)
+          .map((shop) => shop.products)
+          .flatten()
+          .value()
+        return cartProducts
       },
     }),
     {

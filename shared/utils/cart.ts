@@ -1,3 +1,4 @@
+import { AddItemsToCartPayload, AddItemToCartDetail } from '@shared/schema/cart'
 import { CartProduct } from '@shared/schema/product'
 import { CartShop } from '@shared/schema/shop'
 
@@ -66,4 +67,17 @@ export function removeSelectedProductItem(
 ): CartProduct[] {
   const removeIds = Array.isArray(item) ? item.map((product) => product.id) : [item.id]
   return selectedProducts.filter((selectedProduct) => !removeIds.includes(selectedProduct.id))
+}
+
+export function getAddItemsToCartPayload(products: CartProduct[]): AddItemsToCartPayload {
+  const result = {
+    cart_items: products.map((product) => {
+      return {
+        product_id: product.id,
+        shop_id: product.shop.id,
+        quantity: product.count,
+      } as AddItemToCartDetail
+    }),
+  }
+  return result
 }

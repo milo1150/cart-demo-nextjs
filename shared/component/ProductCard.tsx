@@ -5,8 +5,8 @@ import { ShoppingCartOutlined } from '@ant-design/icons'
 import { useCartStore } from '@shared/store/cart'
 import { CartProduct } from '@shared/schema/product'
 import { useEffect, useState } from 'react'
-import { findProductInCart } from '@shared/utils/cart'
 import QuantityStepper from './QuantityStepper'
+import { useAddItemToCart } from '@shared/hook/cart'
 
 type ProductCardActionButtonProps = {
   product: CartProduct
@@ -20,9 +20,14 @@ const ProductCardActionButton: React.FC<ProductCardActionButtonProps> = ({ produ
   const cartStore = useCartStore((state) => state)
   const countProductInCart: number = cartStore.getProductCount(product)
   const [count, setCount] = useState<number>(0)
+  const { onClickAddToCartHandler } = useAddItemToCart()
 
   useEffect(() => {
-    setCount(1)
+    if (product.stock !== 0) {
+      setCount(1)
+    } else {
+      setCount(0)
+    }
   }, [product])
 
   const increaseCount = (): void => {
@@ -33,18 +38,6 @@ const ProductCardActionButton: React.FC<ProductCardActionButtonProps> = ({ produ
   const decreaseCount = (): void => {
     if (count <= 1) return
     setCount((prev) => (prev -= 1))
-  }
-
-  const onClickAddToCart = (): void => {
-    const findProduct = findProductInCart(cartStore.shops, product)
-
-    if (!findProduct.ok) {
-      cartStore.addProduct(product, count)
-    }
-
-    if (findProduct.ok) {
-      cartStore.increaseProduct(product, count)
-    }
   }
 
   return (
@@ -61,7 +54,7 @@ const ProductCardActionButton: React.FC<ProductCardActionButtonProps> = ({ produ
             shape="default"
             className="bg-blue-600 hover:bg-blue-700 border-none w-9! flex items-center justify-center ml-1"
             icon={<ShoppingCartOutlined className="text-lg!" />}
-            onClick={() => onClickAddToCart()}
+            onClick={() => onClickAddToCartHandler(product, count)}
           />
         </Badge>
       </ConfigProvider>
