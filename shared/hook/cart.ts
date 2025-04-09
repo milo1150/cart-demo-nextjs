@@ -84,8 +84,6 @@ export const useConfirmDeleteCartItemModal = ({
       return
     }
 
-    // TODO: enable
-    console.log('FIRE DELETE')
     deleteCartItemMutation.mutate(deleteItem)
   }
 
