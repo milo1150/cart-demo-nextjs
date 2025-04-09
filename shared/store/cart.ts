@@ -31,6 +31,7 @@ export type CartAction = {
   resetState: () => void
   resetSelectedProducts: () => void
   getAllProduct: () => CartProduct[]
+  removeProduct: (shopId: number, productId: number) => void
 }
 
 const initCart: CartState = {
@@ -214,6 +215,25 @@ const useCartStore = create<CartState & CartAction>()(
           .flatten()
           .value()
         return cartProducts
+      },
+
+      removeProduct: (shopId: number, productId: number) => {
+        set((state) => {
+          console.log(shopId, productId)
+          const newState = { ...state }
+          const findShopIndex = newState.shops.findIndex((shop) => shop.id === shopId)
+          if (findShopIndex >= 0) {
+            const shop = newState.shops[findShopIndex]
+            const filterProduct = shop.products.filter((product) => product.id !== productId)
+            shop.products = filterProduct
+            newState.shops[findShopIndex] = shop
+            console.log(newState)
+          } else {
+            console.error('remove product error')
+          }
+          // newState.shops.
+          return { ...newState }
+        })
       },
     }),
     {

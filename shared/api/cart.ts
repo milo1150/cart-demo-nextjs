@@ -1,19 +1,19 @@
 import { setCookie } from '@shared/utils/env'
 import { axiosInstanceWithAuth } from './axios'
 import { endpoint } from './endpoint'
-import { AddItemsToCartPayload } from '@shared/schema/cart'
+import { AddItemsToCartPayload, RemoveItemFromCartPayload } from '@shared/schema/cart'
 
 export async function addItemsToCart(payload: AddItemsToCartPayload) {
-  const res = await axiosInstanceWithAuth.post(endpoint.cartService.cart.addItems, payload)
-  return res
+  return await axiosInstanceWithAuth.post(endpoint.cartService.cart.addItems, payload)
 }
 
-export async function removeItemFromCart() {}
+export async function removeItemFromCart(payload: RemoveItemFromCartPayload) {
+  return await axiosInstanceWithAuth.post(endpoint.cartService.cart.removeItem, payload)
+}
 
 export async function getCartDetail(cartUuid: string) {
   const url = `${endpoint.cartService.cart.getCartDetail}/${cartUuid}`
-  const res = await axiosInstanceWithAuth.get(url)
-  return res
+  return await axiosInstanceWithAuth.get(url)
 }
 
 export async function getCartUuid() {

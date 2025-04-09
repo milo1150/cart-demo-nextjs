@@ -18,11 +18,16 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { getCartDetail } from '@shared/api/cart'
 import { getCookieByKey } from '@shared/utils/env'
-import { useAddItemToCart } from '@shared/hook/cart'
+import { useAddItemToCart, useConfirmDeleteCartItemModal } from '@shared/hook/cart'
+import ConfirmModal from '@shared/component/ConfirmModal'
+import { RemoveItemFromCartPayload } from '@shared/schema/cart'
 
 const queryClient = new QueryClient()
 
-const ProductCard: React.FC<{ product: CartProduct }> = ({ product }) => {
+const ProductCard: React.FC<{
+  product: CartProduct
+  showDeleteItemModal: (item: RemoveItemFromCartPayload) => void
+}> = ({ product, showDeleteItemModal }) => {
   const cartStore = useCartStore((state) => state)
   const { onClickIncreaseItem, onClickDecreaseItem } = useAddItemToCart()
 
@@ -61,14 +66,22 @@ const ProductCard: React.FC<{ product: CartProduct }> = ({ product }) => {
           <p className="text-xl font-bold">${getTotalProductPrice(product.price, product.count)}</p>
         </Col>
         <Col span={4} className="text-center">
-          <DeleteOutlined className="text-xl! cursor-pointer!" />
+          <DeleteOutlined
+            className="text-xl! cursor-pointer!"
+            onClick={() =>
+              showDeleteItemModal({ shop_id: product.shop.id, product_id: product.id })
+            }
+          />
         </Col>
       </Row>
     </Card>
   )
 }
 
-const ShopCard: React.FC<{ shop: CartShop }> = ({ shop }) => {
+const ShopCard: React.FC<{
+  shop: CartShop
+  showDeleteItemModal: (item: RemoveItemFromCartPayload) => void
+}> = ({ shop, showDeleteItemModal }) => {
   const cartStore = useCartStore((state) => state)
 
   return (
@@ -85,11 +98,14 @@ const ShopCard: React.FC<{ shop: CartShop }> = ({ shop }) => {
         <p className="text-xl font-bold">{shop.name}</p>
       </Row>
       <Divider className="my-3!" />
-
       {shop.products.map((product, index) => {
         return (
           <div key={product.id}>
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              showDeleteItemModal={showDeleteItemModal}
+            />
             {index !== shop.products.length - 1 && <Divider className="my-0!" />}
           </div>
         )
@@ -145,6 +161,12 @@ const Cart: React.FC = () => {
     queryFn: () => getCartDetail(cartUuid),
     enabled: false,
   })
+  const {
+    openDeleteModal,
+    hideDeleteCartItemModal,
+    confirmDeleteCartItemHandler,
+    showDeleteCartItemModal,
+  } = useConfirmDeleteCartItemModal({ fetchCartItems: cartDetailQuery.refetch })
 
   useEffect(() => {
     if (cartUuid) {
@@ -163,11 +185,23 @@ const Cart: React.FC = () => {
   return (
     <ShareLayout>
       <Row className="pt-4! justify-center mb-20">
-        {cartStore.shops.map((shop) => {
-          return <ShopCard key={shop.id} shop={shop} />
-        })}
+        {cartStore.shops
+          .filter((shop) => shop.products.length)
+          .map((shop) => {
+            return (
+              <ShopCard key={shop.id} shop={shop} showDeleteItemModal={showDeleteCartItemModal} />
+            )
+          })}
         <CartSummary />
       </Row>
+
+      <ConfirmModal
+        open={openDeleteModal}
+        handleCancel={hideDeleteCartItemModal}
+        handleOk={confirmDeleteCartItemHandler}
+        title="Confirm Delete Product"
+        subtitle="Please review and confirm your product details before proceeding."
+      />
     </ShareLayout>
   )
 }

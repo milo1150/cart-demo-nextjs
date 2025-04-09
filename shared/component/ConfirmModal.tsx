@@ -11,7 +11,7 @@ export type ConfirmPaymentModalProp = {
   subtitle: string
 }
 
-const ConfirmPaymentModal: React.FC<ConfirmPaymentModalAction & ConfirmPaymentModalProp> = ({
+const ConfirmModal: React.FC<ConfirmPaymentModalAction & ConfirmPaymentModalProp> = ({
   open,
   handleOk,
   handleCancel,
@@ -38,4 +38,4 @@ const ConfirmPaymentModal: React.FC<ConfirmPaymentModalAction & ConfirmPaymentMo
   )
 }
 
-export default ConfirmPaymentModal
+export default ConfirmModal

@@ -9,8 +9,8 @@ import Image from 'next/image'
 import { CheckoutInfo, CheckoutProductInfo, CheckoutShopInfo } from '@shared/schema/checkout'
 import React from 'react'
 import _ from 'lodash'
-import ConfirmPaymentModal from '@shared/component/ConfirmPaymentModal'
 import { useConfirmPaymentModal } from '@shared/hook/payment'
+import ConfirmModal from '@shared/component/ConfirmModal'
 
 const queryClient = new QueryClient()
 
@@ -137,7 +137,7 @@ const Checkout: React.FC = () => {
           })}
       </Row>
 
-      <ConfirmPaymentModal
+      <ConfirmModal
         open={openPaymentModal}
         handleCancel={hidePaymentModal}
         handleOk={confirmPaymentHandler}
