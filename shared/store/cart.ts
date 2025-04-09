@@ -219,19 +219,17 @@ const useCartStore = create<CartState & CartAction>()(
 
       removeProduct: (shopId: number, productId: number) => {
         set((state) => {
-          console.log(shopId, productId)
           const newState = { ...state }
           const findShopIndex = newState.shops.findIndex((shop) => shop.id === shopId)
+
           if (findShopIndex >= 0) {
             const shop = newState.shops[findShopIndex]
             const filterProduct = shop.products.filter((product) => product.id !== productId)
-            shop.products = filterProduct
-            newState.shops[findShopIndex] = shop
-            console.log(newState)
+            newState.shops[findShopIndex] = { ...shop, products: filterProduct }
           } else {
             console.error('remove product error')
           }
-          // newState.shops.
+
           return { ...newState }
         })
       },
