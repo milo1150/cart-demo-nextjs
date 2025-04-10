@@ -1,3 +1,4 @@
+import { GetCartDetailResponse } from '@shared/schema/cart'
 import { CartProduct } from '@shared/schema/product'
 import { CartShop } from '@shared/schema/shop'
 import {
@@ -7,7 +8,9 @@ import {
   findShopInCart,
   setAllCheckedProduct,
   updateSelectedProductItem,
-  removeSelectedProductItem,
+  mapCartItemsByShopAndProduct,
+  removeCartProductItem,
+  getUpdateCartItems,
 } from '@shared/utils/cart'
 import _ from 'lodash'
 import { create } from 'zustand'
@@ -32,6 +35,7 @@ export type CartAction = {
   resetSelectedProducts: () => void
   getAllProduct: () => CartProduct[]
   removeProduct: (shopId: number, productId: number) => void
+  updateProductsDetail: (data: GetCartDetailResponse) => void
 }
 
 const initCart: CartState = {
@@ -179,7 +183,7 @@ const useCartStore = create<CartState & CartAction>()(
           // Handle Selected Products
           copyState.selectedProducts = status
             ? updateSelectedProductItem(state.selectedProducts, product)
-            : removeSelectedProductItem(state.selectedProducts, product)
+            : removeCartProductItem(state.selectedProducts, product)
 
           return { ...copyState }
         })
@@ -203,7 +207,7 @@ const useCartStore = create<CartState & CartAction>()(
           // Handle Selected Products
           copyState.selectedProducts = status
             ? updateSelectedProductItem(state.selectedProducts, uncheckProducts)
-            : removeSelectedProductItem(state.selectedProducts, products)
+            : removeCartProductItem(state.selectedProducts, products)
 
           return copyState
         })
@@ -223,12 +227,39 @@ const useCartStore = create<CartState & CartAction>()(
           const findShopIndex = newState.shops.findIndex((shop) => shop.id === shopId)
 
           if (findShopIndex >= 0) {
+            // Update products in shops
             const shop = newState.shops[findShopIndex]
             const filterProduct = shop.products.filter((product) => product.id !== productId)
-            newState.shops[findShopIndex] = { ...shop, products: filterProduct }
+            newState.shops[findShopIndex] = { ...shop, products: [...filterProduct] }
+
+            // Update products in selectProducts
+            const filterSelectedProducts = newState.selectedProducts.filter(
+              (product) => product.id !== productId
+            )
+            newState.selectedProducts = [...filterSelectedProducts]
           } else {
             console.error('remove product error')
           }
+
+          return { ...newState }
+        })
+      },
+
+      updateProductsDetail: (data) => {
+        set((state) => {
+          const newState = { ...state }
+          const hash = mapCartItemsByShopAndProduct(data.cart_items)
+
+          // Update products in shops
+          newState.shops.forEach((shop, shopIndex) => {
+            newState.shops[shopIndex].products = getUpdateCartItems(
+              newState.shops[shopIndex].products,
+              hash
+            )
+          })
+
+          // Update products in selectProducts
+          newState.selectedProducts = getUpdateCartItems(newState.selectedProducts, hash)
 
           return { ...newState }
         })

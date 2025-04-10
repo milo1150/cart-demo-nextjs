@@ -1,9 +1,9 @@
 import { addItemsToCart, removeItemFromCart } from '@shared/api/cart'
-import { RemoveItemFromCartPayload } from '@shared/schema/cart'
+import { GetCartDetailResponse, RemoveItemFromCartPayload } from '@shared/schema/cart'
 import { CartProduct } from '@shared/schema/product'
 import { useCartStore } from '@shared/store/cart'
 import { getAddItemsToCartPayload, findProductInCart } from '@shared/utils/cart'
-import { useMutation } from '@tanstack/react-query'
+import { QueryObserverResult, useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -48,7 +48,7 @@ export const useAddItemToCart = () => {
 }
 
 type UseConfirmDeleteCartItemModalProps = {
-  fetchCartItems: () => Promise<unknown>
+  fetchCartItems: () => Promise<QueryObserverResult<GetCartDetailResponse, Error>>
 }
 export const useConfirmDeleteCartItemModal = ({
   fetchCartItems,
@@ -70,11 +70,19 @@ export const useConfirmDeleteCartItemModal = ({
   const deleteCartItemMutation = useMutation({
     mutationFn: removeItemFromCart,
     onSuccess: async () => {
-      await fetchCartItems()
-      if (deleteItem) {
-        cartStore.removeProduct(deleteItem.shop_id, deleteItem.product_id)
-        hideDeleteCartItemModal()
-      }
+      await fetchCartItems().then((res) => {
+        const cartDetailResData = res.data
+        if (deleteItem && cartDetailResData) {
+          // Remove product
+          cartStore.removeProduct(deleteItem.shop_id, deleteItem.product_id)
+
+          // Update product stock and price
+          cartStore.updateProductsDetail(cartDetailResData)
+
+          // Hide delete modal
+          hideDeleteCartItemModal()
+        }
+      })
     },
   })
 

@@ -1,6 +1,7 @@
-import { AddItemsToCartPayload, AddItemToCartDetail } from '@shared/schema/cart'
+import { AddItemsToCartPayload, AddItemToCartDetail, CartDetailCartItem } from '@shared/schema/cart'
 import { CartProduct } from '@shared/schema/product'
 import { CartShop } from '@shared/schema/shop'
+import _ from 'lodash'
 
 export function findProductInCart(
   shops: CartShop[],
@@ -61,7 +62,7 @@ export function updateSelectedProductItem(
   return [...selectedProducts, ...newItems]
 }
 
-export function removeSelectedProductItem(
+export function removeCartProductItem(
   selectedProducts: CartProduct[],
   item: CartProduct | CartProduct[]
 ): CartProduct[] {
@@ -79,5 +80,57 @@ export function getAddItemsToCartPayload(products: CartProduct[]): AddItemsToCar
       } as AddItemToCartDetail
     }),
   }
+  return result
+}
+
+export function getShopProductHashKey(shopId: number, productId: number): string {
+  return `${shopId}:${productId}`
+}
+
+export type HashCartDetailCartItem = Record<string, CartDetailCartItem>
+export function mapCartItemsByShopAndProduct(data: CartDetailCartItem[]): HashCartDetailCartItem {
+  const result = _.reduce(
+    data,
+    function (acc, curr) {
+      acc[getShopProductHashKey(curr.product.shop_id, curr.product.id)] = curr
+      return acc
+    },
+    {} as HashCartDetailCartItem
+  )
+  return result
+}
+
+export function applyProductUpdate(item: CartProduct, update: CartDetailCartItem): CartProduct {
+  const newProduct = {
+    ...item,
+    stock: update.product.stock,
+    price: update.product.price,
+    count: update.product.stock < item.count ? update.product.stock : item.count,
+  } as CartProduct
+  return newProduct
+}
+
+export function getUpdateCartItems(
+  cartProducts: CartProduct[],
+  hash: HashCartDetailCartItem
+): CartProduct[] {
+  let result = _.cloneDeep(cartProducts) // ! care only safety
+
+  cartProducts.forEach((product, productIndex) => {
+    const key = getShopProductHashKey(product.shop.id, product.id)
+    const hashCartItem = hash[key]
+    const updatedProduct = applyProductUpdate(product, hashCartItem)
+
+    // Remove cart_item instead of update
+    if (updatedProduct.stock === 0) {
+      result = removeCartProductItem(result, updatedProduct)
+    }
+
+    // Update cart item
+    if (updatedProduct.stock > 0) {
+      result[productIndex] = { ...updatedProduct }
+    }
+  })
+
   return result
 }

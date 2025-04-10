@@ -170,7 +170,11 @@ const Cart: React.FC = () => {
 
   useEffect(() => {
     if (cartUuid) {
-      cartDetailQuery.refetch()
+      cartDetailQuery.refetch().then((res) => {
+        if (res.data) {
+          cartStore.updateProductsDetail(res.data)
+        }
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cartUuid])
