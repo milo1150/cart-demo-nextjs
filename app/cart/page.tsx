@@ -21,6 +21,8 @@ import { getCookieByKey } from '@shared/utils/env'
 import { useAddItemToCart, useConfirmDeleteCartItemModal } from '@shared/hook/cart'
 import ConfirmModal from '@shared/component/ConfirmModal'
 import { RemoveItemFromCartPayload } from '@shared/schema/cart'
+import { updateProductStock } from '@shared/api/stock'
+import { createUpdateStockPayloadFromCheckoutPayload } from '@shared/utils/stock'
 
 const queryClient = new QueryClient()
 
@@ -125,7 +127,15 @@ const CartSummary = () => {
   const createCheckoutMutation = useMutation({
     mutationFn: createCheckout,
     onSuccess: async () => {
+      // Update stock (server side)
+      const createCheckoutPayload = generateCheckoutPayload(selectedProducts)
+      const updateStockPayload = createUpdateStockPayloadFromCheckoutPayload(createCheckoutPayload)
+      await updateProductStock(updateStockPayload)
+
+      // Redirect too payment page
       router.push('/checkout')
+
+      // Clear selected product in store
       cartStore.resetSelectedProducts()
     },
   })

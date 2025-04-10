@@ -18,6 +18,9 @@ export const endpoint = {
     product: {
       getProducts: '/shop-product/product/products',
     },
+    stock: {
+      updateStock: '/shop-product/stock/update-product-stock',
+    },
   },
   user: {
     login: '/user/login',
