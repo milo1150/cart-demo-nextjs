@@ -1,4 +1,4 @@
-export type UpdateStockEnum = 'inc' | 'dec'
+export type UpdateStockEnum = 'inc' | 'dec' | 'update'
 
 export type UpdateStockInfo = {
   amount: number

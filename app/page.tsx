@@ -4,24 +4,13 @@ import React from 'react'
 import ShareLayout from '@/shared/layout'
 import ProductCard from '@/shared/component/ProductCard'
 import { Row, Col } from 'antd'
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
-import { getProducts, GetProductsQueryparams } from '@/shared/api/product'
-import { transformCartProduct } from '@shared/dto/product'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useProduct } from '@shared/hook/product'
 
-// Create a client
 const queryClient = new QueryClient()
 
 const Home: React.FC = () => {
-  const params: GetProductsQueryparams = { page_size: 20 }
-  const productQuery = useQuery({
-    queryKey: ['product', params],
-    queryFn: () => getProducts(params),
-    retry: false,
-    refetchOnWindowFocus: false,
-    select(data) {
-      return data.map((item) => transformCartProduct(item))
-    },
-  })
+  const { productQuery } = useProduct()
 
   return (
     <ShareLayout>
