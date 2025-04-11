@@ -9,11 +9,14 @@ import { login } from '@shared/api/user'
 import { AxiosError } from 'axios'
 import { deleteCookie } from '@shared/utils/env'
 import { getCartUuid } from '@shared/api/cart'
+import Image from 'next/image'
+import { useAntdStore } from '@shared/store/antd'
 
 const queryClient = new QueryClient()
 
 const Login = () => {
   const router = useRouter()
+  const darkmode = useAntdStore((state) => state.darkmode)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const userQuery = useMutation({
@@ -47,8 +50,21 @@ const Login = () => {
   }
 
   return (
-    <Row justify="center" align="middle" style={{ height: '100vh' }}>
-      <Col xs={24} sm={24} md={12} lg={8} xl={4} span={4} className="p-4">
+    <Row
+      justify="center"
+      align="middle"
+      className={`h-lvh! w-lvw! ${darkmode ? 'bg-black!' : 'bg-gray-100!'}`}
+    >
+      <Col xs={24} sm={24} md={12} lg={8} xl={6} xxl={5} span={5} className="p-4">
+        <div className="flex justify-center">
+          <Image
+            src="/assets/logo.png"
+            width={160}
+            height={160}
+            alt="App Logo"
+            className="rounded-xl"
+          />
+        </div>
         <div style={{ marginBottom: 16 }}>
           <Input
             size="large"
@@ -69,7 +85,7 @@ const Login = () => {
           />
         </div>
 
-        <Button type="primary" block size="large" onClick={handleSubmit}>
+        <Button type="primary" block size="large" onClick={handleSubmit} className="bg-indigo-700!">
           Login
         </Button>
       </Col>
