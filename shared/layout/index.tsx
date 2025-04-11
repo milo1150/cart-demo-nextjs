@@ -13,18 +13,19 @@ type ShareLayoutProps = {
 
 const ShareLayout: React.FC<ShareLayoutProps> = ({ children }) => {
   const { Header, Content } = Layout
-  const layoutStyle: React.CSSProperties = {}
   const antdStore = useAntdStore((state) => state)
 
   return (
     <ConfigProvider
       theme={{ algorithm: antdStore.darkmode ? theme.darkAlgorithm : theme.defaultAlgorithm }}
     >
-      <Layout className="h-full w-full max-w-screen items-center" style={layoutStyle}>
-        <Header className="w-full flex justify-center p-0! bg-blue-600!">
+      <Layout className="min-h-screen! w-full max-w-screen items-center">
+        <Header
+          className={`w-full flex justify-center p-0! ${antdStore.darkmode ? 'bg-black!' : 'bg-gray-100!'}`}
+        >
           <AppHeader />
         </Header>
-        <Content className="w-full max-w-screen-lg px-4 md:px-8 lg:px-12 xl:px-16">
+        <Content className="w-full! h-full! max-w-screen-lg px-4 md:px-8 lg:px-12 xl:px-16 pt-4!">
           <AuthGuard>{children}</AuthGuard>
         </Content>
       </Layout>

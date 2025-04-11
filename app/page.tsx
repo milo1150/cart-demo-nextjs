@@ -30,7 +30,7 @@ const Home: React.FC = () => {
           <SearchInput />
         </div> */}
 
-        <Row gutter={[16, 16]} className="mt-4">
+        <Row gutter={[16, 16]} className="mt-0!">
           {productQuery.data?.map((product) => {
             return (
               <Col key={product.id} xs={12} sm={8} md={6} lg={6} xl={6}>

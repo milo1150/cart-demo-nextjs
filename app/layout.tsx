@@ -35,7 +35,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-black! h-auto`}>
+      {/* bg-red-500 for remark */}
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} bg-red-500! antialiased h-auto`}
+      >
         <AntdRegistry>{children}</AntdRegistry>
       </body>
     </html>

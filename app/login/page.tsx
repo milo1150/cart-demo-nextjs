@@ -48,7 +48,7 @@ const Login = () => {
 
   return (
     <Row justify="center" align="middle" style={{ height: '100vh' }}>
-      <Col xs={24} sm={24} md={12} lg={8} xl={6} span={6} className="p-4">
+      <Col xs={24} sm={24} md={12} lg={8} xl={4} span={4} className="p-4">
         <div style={{ marginBottom: 16 }}>
           <Input
             size="large"
