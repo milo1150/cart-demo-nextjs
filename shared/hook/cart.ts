@@ -15,7 +15,7 @@ export const useAddItemToCart = () => {
   const updateCartItemDebounced = useDebouncedCallback(() => {
     const payload = getAddItemsToCartPayload(cartStore.getAllProduct())
     addItemMutation.mutate(payload)
-  }, 1500)
+  }, 0)
 
   const onClickAddToCartHandler = (product: CartProduct, count: number) => {
     if (product.stock <= 0) {
