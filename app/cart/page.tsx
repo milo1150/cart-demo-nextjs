@@ -153,6 +153,7 @@ const CartSummary = () => {
         </p>
         <Button
           className="border-blue-300! bg-blue-300! font-bold! text-md!"
+          disabled={cartStore.selectedProducts.length === 0}
           onClick={() => checkoutHandler()}
         >
           CHECKOUT
@@ -169,7 +170,6 @@ const Cart: React.FC = () => {
   const cartDetailQuery = useQuery({
     queryKey: ['cart-detail'],
     queryFn: () => getCartDetail(cartUuid),
-    enabled: false,
   })
   const {
     openDeleteModal,
