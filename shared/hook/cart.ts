@@ -18,6 +18,10 @@ export const useAddItemToCart = () => {
   }, 1500)
 
   const onClickAddToCartHandler = (product: CartProduct, count: number) => {
+    if (product.stock <= 0) {
+      return
+    }
+
     // Update local storage
     const findProduct = findProductInCart(cartStore.shops, product)
     if (!findProduct.ok) {
