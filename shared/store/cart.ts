@@ -247,6 +247,10 @@ const useCartStore = create<CartState & CartAction>()(
 
       updateProductsDetail: (data) => {
         set((state) => {
+          if (data.cart_items.length <= 0) {
+            return state
+          }
+
           const newState = { ...state }
           const hash = mapCartItemsByShopAndProduct(data.cart_items)
 
