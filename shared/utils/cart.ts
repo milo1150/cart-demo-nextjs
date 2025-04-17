@@ -87,6 +87,10 @@ export function getShopProductHashKey(shopId: number, productId: number): string
   return `${shopId}:${productId}`
 }
 
+export function getShopHashKey(shopId: number): string {
+  return `${shopId}`
+}
+
 export type HashCartDetailCartItem = Record<string, CartDetailCartItem>
 export function mapCartItemsByShopAndProduct(data: CartDetailCartItem[]): HashCartDetailCartItem {
   const result = _.reduce(
@@ -96,6 +100,19 @@ export function mapCartItemsByShopAndProduct(data: CartDetailCartItem[]): HashCa
       return acc
     },
     {} as HashCartDetailCartItem
+  )
+  return result
+}
+
+export type HashShopCartItem = Record<string, string>
+export function mapCartItemsByShop(data: CartDetailCartItem[]): HashShopCartItem {
+  const result = _.reduce(
+    data,
+    function (acc, curr) {
+      acc[getShopHashKey(curr.product.shop_id)] = curr.product.shop_id.toString() || ''
+      return acc
+    },
+    {} as HashShopCartItem
   )
   return result
 }
@@ -132,5 +149,28 @@ export function getUpdateCartItems(
     }
   })
 
+  return result
+}
+
+export function updateCartShopsFromItems(
+  hashShop: HashShopCartItem,
+  hashShopProduct: HashCartDetailCartItem,
+  cartShops: CartShop[]
+): CartShop[] {
+  const result: CartShop[] = _.cloneDeep(cartShops)
+    .filter((cartShop) => hashShop[cartShop.id])
+    .map((cartShop) => {
+      cartShop.products = cartShop.products.map((product) => {
+        const key = getShopProductHashKey(cartShop.id, product.id)
+        const hashProduct = hashShopProduct[key]
+        const newProduct = {
+          ...product,
+          price: hashProduct.product.price,
+          stock: hashProduct.product.stock,
+        } as CartProduct
+        return newProduct
+      })
+      return cartShop
+    })
   return result
 }

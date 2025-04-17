@@ -11,6 +11,8 @@ import {
   mapCartItemsByShopAndProduct,
   removeCartProductItem,
   getUpdateCartItems,
+  updateCartShopsFromItems,
+  mapCartItemsByShop,
 } from '@shared/utils/cart'
 import _ from 'lodash'
 import { create } from 'zustand'
@@ -247,23 +249,26 @@ const useCartStore = create<CartState & CartAction>()(
 
       updateProductsDetail: (data) => {
         set((state) => {
+          const newState = { ...state }
+
           if (data.cart_items.length <= 0) {
-            return state
+            newState.shops = []
+            newState.selectedProducts = []
           }
 
-          const newState = { ...state }
-          const hash = mapCartItemsByShopAndProduct(data.cart_items)
+          if (data.cart_items.length > 0) {
+            const hashShopProduct = mapCartItemsByShopAndProduct(data.cart_items)
+            const hashShop = mapCartItemsByShop(data.cart_items)
 
-          // Update products in shops
-          newState.shops.forEach((shop, shopIndex) => {
-            newState.shops[shopIndex].products = getUpdateCartItems(
-              newState.shops[shopIndex].products,
-              hash
+            // Update cart item list
+            newState.shops = updateCartShopsFromItems(hashShop, hashShopProduct, newState.shops)
+
+            // Update products in selectProducts
+            newState.selectedProducts = getUpdateCartItems(
+              newState.selectedProducts,
+              hashShopProduct
             )
-          })
-
-          // Update products in selectProducts
-          newState.selectedProducts = getUpdateCartItems(newState.selectedProducts, hash)
+          }
 
           return { ...newState }
         })
