@@ -1,3 +1,4 @@
+import { transformCartDetailCartItem } from '@shared/dto/product'
 import { AddItemsToCartPayload, AddItemToCartDetail, CartDetailCartItem } from '@shared/schema/cart'
 import { CartProduct } from '@shared/schema/product'
 import { CartShop } from '@shared/schema/shop'
@@ -96,7 +97,7 @@ export function mapCartItemsByShopAndProduct(data: CartDetailCartItem[]): HashCa
   const result = _.reduce(
     data,
     function (acc, curr) {
-      acc[getShopProductHashKey(curr.product.shop_id, curr.product.id)] = curr
+      acc[getShopProductHashKey(curr.product.shop.id, curr.product.id)] = curr
       return acc
     },
     {} as HashCartDetailCartItem
@@ -109,10 +110,28 @@ export function mapCartItemsByShop(data: CartDetailCartItem[]): HashShopCartItem
   const result = _.reduce(
     data,
     function (acc, curr) {
-      acc[getShopHashKey(curr.product.shop_id)] = curr.product.shop_id.toString() || ''
+      acc[getShopHashKey(curr.product.shop.id)] = curr.product.shop.id.toString() || ''
       return acc
     },
     {} as HashShopCartItem
+  )
+  return result
+}
+
+export type HashShopCartCollection = Record<string, CartShop>
+export function mapCartItemsToShops(data: CartDetailCartItem[]): HashShopCartCollection {
+  const result = _.reduce(
+    data,
+    function (acc, curr) {
+      acc[getShopHashKey(curr.shop_id)] = {
+        id: curr.shop_id,
+        name: curr.product.shop.name,
+        checked: false,
+        products: [],
+      } as CartShop
+      return acc
+    },
+    {} as HashShopCartCollection
   )
   return result
 }
@@ -171,4 +190,13 @@ export function updateCartShopsFromItems(
       return cartShop
     })
   return result
+}
+
+export function updateCartShopsFromCartItems(cartItems: CartDetailCartItem[]): CartShop[] {
+  const hashCartShop: Record<string, CartShop> = mapCartItemsToShops(cartItems)
+  cartItems.forEach((item) => {
+    const cartProduct = transformCartDetailCartItem(item)
+    hashCartShop[item.shop_id].products.push(cartProduct)
+  })
+  return _.values(hashCartShop)
 }

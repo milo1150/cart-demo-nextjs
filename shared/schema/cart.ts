@@ -45,5 +45,5 @@ export interface CartDetailProduct {
   description: string
   price: number
   stock: number
-  shop_id: number
+  shop: { id: number; name: string }
 }

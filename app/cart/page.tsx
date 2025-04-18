@@ -166,12 +166,18 @@ const CartSummary = () => {
 const Cart: React.FC = () => {
   const cartStore = useCartStore((state) => state)
   const [cartUuid, setCartUuid] = useState<string>('')
-
   const cartDetailQuery = useQuery({
     queryKey: ['cart-detail'],
-    queryFn: () => getCartDetail(cartUuid),
+    queryFn: async () => {
+      const data = await getCartDetail(cartUuid)
+      if (data) {
+        cartStore.updateProductsDetail(data)
+      }
+      return data
+    },
     enabled: !!cartUuid, // Only run the query when cartUuid is truthy
   })
+
   const {
     openDeleteModal,
     hideDeleteCartItemModal,
