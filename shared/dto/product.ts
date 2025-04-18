@@ -29,7 +29,7 @@ export function transformCartDetailCartItem(item: CartDetailCartItem): CartProdu
     price: item.product.price,
     shop: item.product.shop,
     stock: item.product.stock,
-    imageUrl: '', // TODO:
+    imageUrl: item.product.image,
     count: item.quantity,
     checked: false,
   }
