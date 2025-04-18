@@ -170,6 +170,7 @@ const Cart: React.FC = () => {
   const cartDetailQuery = useQuery({
     queryKey: ['cart-detail'],
     queryFn: () => getCartDetail(cartUuid),
+    enabled: !!cartUuid, // Only run the query when cartUuid is truthy
   })
   const {
     openDeleteModal,
@@ -177,17 +178,6 @@ const Cart: React.FC = () => {
     confirmDeleteCartItemHandler,
     showDeleteCartItemModal,
   } = useConfirmDeleteCartItemModal({ fetchCartItems: cartDetailQuery.refetch })
-
-  useEffect(() => {
-    if (cartUuid) {
-      cartDetailQuery.refetch().then((res) => {
-        if (res.data) {
-          cartStore.updateProductsDetail(res.data)
-        }
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cartUuid])
 
   useEffect(() => {
     const cartUuid = getCookieByKey('c_id')
