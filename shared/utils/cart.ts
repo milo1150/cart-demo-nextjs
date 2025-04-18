@@ -160,16 +160,14 @@ export function updateCartShopsFromItems(
   const result: CartShop[] = _.cloneDeep(cartShops)
     .filter((cartShop) => hashShop[cartShop.id])
     .map((cartShop) => {
-      cartShop.products = cartShop.products.map((product) => {
-        const key = getShopProductHashKey(cartShop.id, product.id)
-        const hashProduct = hashShopProduct[key]
-        const newProduct = {
-          ...product,
-          price: hashProduct.product.price,
-          stock: hashProduct.product.stock,
-        } as CartProduct
-        return newProduct
-      })
+      cartShop.products = cartShop.products
+        .filter((product) => hashShopProduct[getShopProductHashKey(cartShop.id, product.id)])
+        .map((product) => {
+          const key = getShopProductHashKey(cartShop.id, product.id)
+          const hashProduct = hashShopProduct[key]
+          const newProduct = applyProductUpdate(product, hashProduct)
+          return newProduct
+        })
       return cartShop
     })
   return result
