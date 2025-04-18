@@ -55,6 +55,7 @@ const ProductCardActionButton: React.FC<ProductCardActionButtonProps> = ({ produ
             className="bg-blue-600 hover:bg-blue-700 border-none w-9! flex items-center justify-center ml-1"
             icon={<ShoppingCartOutlined className="text-lg!" />}
             onClick={() => onClickAddToCartHandler(product, count)}
+            disabled={!product.stock}
           />
         </Badge>
       </ConfigProvider>

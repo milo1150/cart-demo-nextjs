@@ -152,11 +152,7 @@ const useCartStore = create<CartState & CartAction>()(
 
       getAllProductCount: () => {
         return _(get().shops)
-          .map((shop) =>
-            _(shop.products)
-              .map((product) => product.count)
-              .sum()
-          )
+          .map((shop) => shop.products.length)
           .sum()
       },
 
