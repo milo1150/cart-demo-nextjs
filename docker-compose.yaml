@@ -16,16 +16,16 @@ services:
       context: .
       dockerfile: Dockerfile.nginx
     restart: unless-stopped
-    ports:
-      - '3001:80'
-    # expose:
-    #   - 80
+    # ports:
+    #   - '3001:80'
+    expose:
+      - ${SERVER_PORT}
     depends_on:
       - cart-nextjs-app
     env_file:
       - .env
-    volumes:
-      - ./nginx/logs:/var/log/nginx
+    # volumes:
+    #   - ./nginx/logs:/var/log/nginx
     networks:
       - cart-web-app-network
 
