@@ -1,4 +1,17 @@
 services:
+  cart-nextjs-caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile.caddy
+    expose:
+      - ${CADDY_SERVER_PORT}
+    networks:
+      - cart-web-app-network
+
   cart-nextjs-app:
     build:
       context: .
@@ -8,21 +21,6 @@ services:
       - ${APP_SERVICE_PORT}
     env_file:
       - .env
-    networks:
-      - cart-web-app-network
-
-  cart-nextjs-caddy:
-    image: caddy:latest
-    restart: unless-stopped
-    env_file:
-      - .env
-    depends_on:
-      - cart-nextjs-app
-    build:
-      context: .
-      dockerfile: Dockerfile.caddy
-    expose:
-      - ${CADDY_SERVER_PORT}
     networks:
       - cart-web-app-network
 
