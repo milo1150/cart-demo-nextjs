@@ -18,10 +18,11 @@ services:
       - .env
     depends_on:
       - cart-nextjs-app
-    ports:
-      - ${CADDY_HOST_PORT}:${CADDY_SERVER_PORT}
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
+    build:
+      context: .
+      dockerfile: Dockerfile.caddy
+    expose:
+      - ${CADDY_SERVER_PORT}
     networks:
       - cart-web-app-network
 

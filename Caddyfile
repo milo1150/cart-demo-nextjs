@@ -8,7 +8,7 @@
 	}
 }
 
-{$CADDY_SERVER_PORT} {
+:{$CADDY_SERVER_PORT} {
 	log default {
 		level DEBUG
 		hostnames {args[0]}
@@ -16,7 +16,7 @@
 		format json
 	}
 
-	reverse_proxy {$APP_SERVICE_NAME}{$APP_SERVICE_PORT}
+	reverse_proxy {$APP_SERVICE_NAME}:{$APP_SERVICE_PORT}
 
 	header {
 		# Optional CORS support if needed
@@ -24,7 +24,6 @@
 		Access-Control-Allow-Methods "GET, POST, OPTIONS, PATCH"
 		Access-Control-Allow-Headers "Authorization, Content-Type"
 		# Access-Control-Allow-Credentials true
-		# }
 
 		encode gzip
 	}
