@@ -11,21 +11,38 @@ services:
     networks:
       - cart-web-app-network
 
-  cart-nextjs-nginx:
-    build:
-      context: .
-      dockerfile: Dockerfile.nginx
+  # cart-nextjs-nginx:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.nginx
+  #   restart: unless-stopped
+  #   # ports:
+  #   #   - '3001:80'
+  #   expose:
+  #     - ${SERVER_PORT}
+  #   depends_on:
+  #     - cart-nextjs-app
+  #   env_file:
+  #     - .env
+  #   networks:
+  #     - cart-web-app-network
+
+  cart-nextjs-caddy:
+    image: caddy:latest
     restart: unless-stopped
-    # ports:
-    #   - '3001:80'
-    expose:
-      - ${SERVER_PORT}
     depends_on:
       - cart-nextjs-app
+    # ports:
+    #   - '3001:80' # for test in local
+    build:
+      context: .
+      dockerfile: Dockerfile.caddy
     env_file:
       - .env
-    # volumes:
-    #   - ./nginx/logs:/var/log/nginx
+    expose:
+      - ${SERVER_PORT}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
     networks:
       - cart-web-app-network
 
