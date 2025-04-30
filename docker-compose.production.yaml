@@ -22,7 +22,7 @@ services:
       context: .
       dockerfile: Dockerfile.caddy
     expose:
-      - ${CADDY_SERVER_PORT}
+      - ${GATEWAY_DOMAIN}
     networks:
       - cart-web-app-network
 

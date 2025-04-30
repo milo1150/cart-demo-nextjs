@@ -8,7 +8,7 @@
 	}
 }
 
-{$CADDY_SERVER_PORT} {
+{$GATEWAY_DOMAIN} {
 	log default {
 		level DEBUG
 		hostnames {args[0]}
