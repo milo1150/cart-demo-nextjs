@@ -1,5 +1,5 @@
-:{$CADDY_SERVER_PORT} {
-	reverse_proxy {$APP_SERVICE_NAME}:{$APP_SERVICE_PORT}
+{$CADDY_SERVER_PORT} {
+	reverse_proxy {$APP_SERVICE_NAME}{$APP_SERVICE_PORT}
 
 	header {
 		# Optional CORS support if needed
