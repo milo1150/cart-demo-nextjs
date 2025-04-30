@@ -1,0 +1,34 @@
+# Install dependencies
+FROM node:23.10.0-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm install
+
+# Build the app
+FROM node:23.10.0-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build
+RUN ls -al
+
+# Run the app
+FROM node:23.10.0-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+# Static assets used in app
+COPY --from=builder /app/public ./public
+
+# Built app output from next build
+COPY --from=builder /app/.next ./.next
+
+# Required for next start and SSR/api/middleware
+COPY --from=builder /app/node_modules ./node_modules 
+
+# 	Optional but useful for app metadata
+COPY --from=builder /app/package.json ./package.json
+
+EXPOSE 3000
+
+CMD ["npm", "start"]

@@ -1,0 +1,34 @@
+services:
+  cart-nextjs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.nextjs
+    restart: unless-stopped
+    expose:
+      - ${SERVICE_PORT}
+    env_file:
+      - .env
+    networks:
+      - cart-web-app-network
+
+  cart-nextjs-nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    restart: unless-stopped
+    ports:
+      - '3001:80'
+    # expose:
+    #   - 80
+    depends_on:
+      - cart-nextjs-app
+    env_file:
+      - .env
+    volumes:
+      - ./nginx/logs:/var/log/nginx
+    networks:
+      - cart-web-app-network
+
+networks:
+  cart-web-app-network:
+    driver: bridge
