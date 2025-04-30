@@ -41,8 +41,8 @@ services:
       - .env
     expose:
       - ${SERVER_PORT}
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
+    # volumes:
+    #   - ./Caddyfile:/etc/caddy/Caddyfile
     networks:
       - cart-web-app-network
 
