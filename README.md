@@ -34,3 +34,18 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Env
+
+```bash
+NEXT_PUBLIC_BACKEND_URL=http://localhost
+
+# next-js container
+APP_SERVICE_NAME=cart-nextjs-app
+APP_SERVICE_PORT=3000
+
+# caddy container
+GATEWAY_DOMAIN=:80
+CADDY_HOST_PORT=3001 # use in local only
+CADDY_SERVER_PORT=80
+```
