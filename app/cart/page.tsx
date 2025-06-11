@@ -2,11 +2,10 @@
 
 import ShareLayout from '@shared/layout'
 import { QueryClient, QueryClientProvider, useMutation, useQuery } from '@tanstack/react-query'
-import { Button, Card, Checkbox, Col, Divider, Row } from 'antd'
+import { Button, Card, Checkbox, Col, Divider, Row, Image } from 'antd'
 import { StyleProvider } from '@ant-design/cssinjs'
 import { useCartStore } from '@shared/store/cart'
 import { CartProduct } from '@shared/schema/product'
-import Image from 'next/image'
 import QuantityStepper from '@shared/component/QuantityStepper'
 import { getTotalProductPrice } from '@shared/utils/cart'
 import { DeleteOutlined } from '@ant-design/icons'
