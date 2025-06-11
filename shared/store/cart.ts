@@ -244,7 +244,6 @@ const useCartStore = create<CartState & CartAction>()(
 
       updateProductsDetail: (data) => {
         set((state) => {
-          console.log('bruh')
           const newState = { ...state }
 
           if (data.cart_items.length <= 0) {
